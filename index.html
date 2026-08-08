@@ -2,12 +2,21 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRL serviços - Gestão e Checklist HVAC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FRL serviços - Checklist HVAC</title>
+
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#002B49">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="FRL serviços">
+
+    <!-- Styling and Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -20,8 +29,7 @@
                         brand: {
                             blue: '#004A7C',
                             gold: '#E0A100',
-                            red: '#B91C1C',
-                            light: '#F3F4F6'
+                            red: '#B91C1C'
                         }
                     },
                     fontFamily: {
@@ -32,14 +40,12 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             user-select: none;
-        }
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom, 5rem);
+            -webkit-tap-highlight-color: transparent;
         }
         .signature-canvas {
             border: 2px dashed #cbd5e1;
@@ -55,28 +61,25 @@
             background: #cbd5e1;
             border-radius: 9999px;
         }
-        /* Printable styling */
         @media print {
             .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white; color: black; }
         }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <div id="pwa-install-banner" class="bg-navy-900 text-white px-4 py-3 shadow-lg border-b border-sky-500/30 flex items-center justify-between sticky top-0 z-50 text-sm transition-all duration-300">
+    <div id="pwa-install-banner" class="bg-navy-900 text-white px-4 py-3 shadow-md border-b border-sky-500/30 flex items-center justify-between sticky top-0 z-50 text-sm">
         <div class="flex items-center space-x-3">
-            <div class="bg-sky-500/20 p-2 rounded-lg text-sky-400">
-                <i class="fa-solid fa-download text-lg"></i>
+            <div class="bg-sky-500/20 p-2 rounded-xl text-sky-400 flex items-center justify-center">
+                <i class="fa-solid fa-mobile-screen-button text-lg"></i>
             </div>
             <div>
-                <p class="font-semibold leading-tight">Instalar App FRL serviços</p>
-                <p class="text-xs text-slate-300">Acesso rápido para técnicos no GitHub / Android</p>
+                <p class="font-bold leading-tight text-xs sm:text-sm">Instalar FRL serviços</p>
+                <p class="text-[11px] text-slate-300">Toque para adicionar à sua tela inicial</p>
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="triggerPwaInstall()" class="bg-sky-500 hover:bg-sky-600 text-white font-medium text-xs px-3 py-1.5 rounded-lg shadow transition">
+            <button onclick="handleInstallClick()" class="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow transition">
                 Instalar
             </button>
             <button onclick="dismissPwaBanner()" class="text-slate-400 hover:text-white p-1">
@@ -85,997 +88,563 @@
         </div>
     </div>
 
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 py-3 shadow-sm">
+    <div id="install-instructions-modal" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl border border-slate-200">
+            <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+                <h3 class="font-bold text-navy-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-download text-sky-500"></i> Como instalar o App
+                </h3>
+                <button onclick="closeInstallModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600">
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <p class="font-bold text-navy-900 mb-1 flex items-center gap-1.5">
+                        <i class="fa-brands fa-android text-emerald-600 text-sm"></i> No Android (Google Chrome):
+                    </p>
+                    <ol class="list-decimal list-inside space-y-1 text-[11px]">
+                        <li>Toque nos <strong>3 pontinhos (⋮)</strong> no canto superior direito do navegador.</li>
+                        <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
+                        <li>Confirme para criar o ícone <strong>FRL serviços</strong>.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <p class="font-bold text-navy-900 mb-1 flex items-center gap-1.5">
+                        <i class="fa-brands fa-apple text-slate-800 text-sm"></i> No iPhone (Safari):
+                    </p>
+                    <ol class="list-decimal list-inside space-y-1 text-[11px]">
+                        <li>Toque no botão <strong>Compartilhar <i class="fa-solid fa-arrow-up-from-bracket"></i></strong> na barra inferior.</li>
+                        <li>Role até a opção <strong>"Adicionar à Tela de Início"</strong>.</li>
+                        <li>Toque em <strong>Adicionar</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <button onclick="closeInstallModal()" class="w-full bg-navy-900 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <header class="bg-white border-b border-slate-200 sticky top-11 z-40 px-4 py-3 shadow-sm">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-navy-900 text-white flex items-center justify-center font-bold text-lg shadow-md border border-sky-400/20">
+                <div class="w-10 h-10 rounded-2xl bg-navy-900 text-white flex items-center justify-center font-bold text-lg shadow-md border border-sky-400/20">
                     <i class="fa-solid fa-snowflake text-sky-400"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-navy-900 leading-none text-base tracking-tight" id="header-title">FRL serviços</h1>
-                    <span class="text-xs text-slate-500 font-medium">Manutenção Preventiva HVAC</span>
+                    <h1 class="font-extrabold text-navy-900 leading-none text-base tracking-tight">FRL serviços</h1>
+                    <span class="text-[11px] text-slate-500 font-medium">Checklist e Manutenção Preventiva HVAC</span>
                 </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-9 h-9 rounded-full bg-slate-200 overflow-hidden border-2 border-navy-800 shadow-sm">
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=120" alt="Técnico" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/002B49/FFFFFF?text=TEC'">
-                </div>
-            </div>
+            <button onclick="openInstallModal()" class="text-xs bg-slate-100 hover:bg-slate-200 font-bold text-navy-900 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info text-sky-600"></i> Ajuda
+            </button>
         </div>
     </header>
 
-    <main class="flex-grow max-w-md w-full mx-auto p-4 pb-24 overflow-y-auto">
+    <main class="flex-grow max-w-md w-full mx-auto p-4 pb-12 overflow-y-auto space-y-6">
 
-        <section id="view-dashboard" class="space-y-5">
-            <!-- User Welcome -->
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
-                <div>
-                    <h2 class="text-lg font-bold text-navy-900">Olá, Marcos Silva!</h2>
-                    <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                        <i class="fa-solid fa-location-dot text-sky-600"></i> Parque Atlântico, Macaé-RJ
-                    </p>
-                </div>
-                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full border border-emerald-200">
-                    Online
-                </span>
-            </div>
+        <form id="checklist-form" onsubmit="generatePDFReport(event)" class="space-y-6">
 
-            <!-- Summary Status Progress Card -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">MANUTENÇÕES DE HOJE</p>
-                <div class="flex items-center justify-between">
+            <!-- Seção 1: Dados do Empreendimento -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <h2 class="text-xs font-extrabold text-navy-900 uppercase tracking-wider flex items-center gap-2 border-b pb-2 border-slate-100">
+                    <i class="fa-solid fa-building text-amber-500"></i> DADOS DO EMPREENDIMENTO / CLIENTE
+                </h2>
+
+                <div class="space-y-2 text-xs font-semibold">
                     <div>
-                        <span class="text-3xl font-extrabold text-navy-900" id="dash-total-count">5</span>
-                        <span class="text-xs text-slate-500 ml-1">Equipamentos</span>
-                        <div class="mt-3 space-y-1.5 text-xs font-semibold">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-navy-800"></span>
-                                <span id="dash-done-count">3 CONCLUÍDAS</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                                <span id="dash-pending-count">2 PENDENTES</span>
-                            </div>
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">CLIENTE *</label>
+                        <input type="text" id="client-name" required placeholder="Ex: Petrobras Macaé" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                    </div>
+                    <div>
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">ENDEREÇO *</label>
+                        <input type="text" id="client-address" required placeholder="Ex: Av. Elias Agostinho, 100 - Macaé" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TELEFONE *</label>
+                            <input type="text" id="client-phone" required placeholder="(22) 99999-9999" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        </div>
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">RESPONSÁVEL *</label>
+                            <input type="text" id="client-resp" required placeholder="Ex: Marcos Silva" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                     </div>
-                    <!-- Donut Progress Chart Visual -->
-                    <div class="relative w-20 h-20 flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-slate-100" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="text-navy-800" stroke-dasharray="60, 100" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <span class="absolute text-sm font-bold text-navy-900">60%</span>
-                    </div>
                 </div>
             </div>
 
-            <!-- Quick Action Buttons -->
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="switchView('new-equipment')" class="bg-navy-900 hover:bg-navy-800 text-white p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center text-center transition active:scale-95 group">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-2 group-hover:bg-white/20">
-                        <i class="fa-solid fa-square-plus text-lg text-sky-400"></i>
-                    </div>
-                    <span class="font-bold text-xs uppercase tracking-wider">NOVO CADASTRO</span>
-                </button>
-                <button onclick="switchView('equipments')" class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center text-center transition active:scale-95 group">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-2 group-hover:bg-white/20">
-                        <i class="fa-solid fa-list-check text-lg text-white"></i>
-                    </div>
-                    <span class="font-bold text-xs uppercase tracking-wider">CHECKLIST</span>
-                </button>
-            </div>
+            <!-- Seção 2: Dados do Equipamento -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <h2 class="text-xs font-extrabold text-navy-900 uppercase tracking-wider flex items-center gap-2 border-b pb-2 border-slate-100">
+                    <i class="fa-solid fa-fan text-sky-600"></i> DADOS DO EQUIPAMENTO
+                </h2>
 
-            <!-- Alerts List Section -->
-            <div class="space-y-3">
-                <div class="flex items-center space-x-2 text-rose-700 font-bold text-sm">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    <span>AVISOS IMPORTANTES</span>
-                </div>
-
-                <!-- Alert Card Urgent -->
-                <div class="bg-white border-l-4 border-rose-600 rounded-xl p-3.5 shadow-sm space-y-1.5">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="px-2 py-0.5 bg-rose-100 text-rose-700 font-bold rounded">Serviço Necessário</span>
-                        <span class="font-semibold text-slate-400">AGORA</span>
-                    </div>
-                    <p class="font-bold text-navy-900 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-box text-slate-400"></i> CHILLER CH-04
-                    </p>
-                    <p class="text-xs text-slate-600 leading-snug">
-                        Pressão do fluido refrigerante abaixo do limite operacional de segurança.
-                    </p>
-                </div>
-
-                <!-- Alert Card Pending -->
-                <div class="bg-white border-l-4 border-amber-500 rounded-xl p-3.5 shadow-sm space-y-1.5">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded">Pendente</span>
-                        <span class="font-semibold text-slate-400">HOJE, 14:00</span>
-                    </div>
-                    <p class="font-bold text-navy-900 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-fan text-slate-400"></i> FILTRO AHU-02
-                    </p>
-                    <p class="text-xs text-slate-600 leading-snug">
-                        Troca programada de filtros de partículas e inspeção visual dos dutos.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-equipments" class="space-y-4 hidden">
-            <!-- Search & Filter Controls -->
-            <div class="space-y-3">
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
-                    <input type="text" id="equipment-search" oninput="filterEquipments()" placeholder="Buscar por ID, Modelo ou Série" class="w-full pl-10 pr-10 py-2.5 bg-slate-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-navy-800 text-slate-800 font-medium placeholder-slate-500">
-                    <button class="absolute right-3 top-3 text-slate-500">
-                        <i class="fa-solid fa-sliders"></i>
-                    </button>
-                </div>
-
-                <!-- Filter Tabs -->
-                <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs">
-                    <button onclick="setFilter('all')" class="filter-btn active-filter px-3.5 py-1.5 rounded-full font-semibold transition bg-navy-900 text-white shadow-sm">Todos</button>
-                    <button onclick="setFilter('em-dia')" class="filter-btn px-3.5 py-1.5 rounded-full font-semibold transition bg-slate-200 text-slate-700 hover:bg-slate-300">Em dia</button>
-                    <button onclick="setFilter('pendente')" class="filter-btn px-3.5 py-1.5 rounded-full font-semibold transition bg-slate-200 text-slate-700 hover:bg-slate-300">Pendente</button>
-                    <button onclick="setFilter('urgente')" class="filter-btn px-3.5 py-1.5 rounded-full font-semibold transition bg-slate-200 text-slate-700 hover:bg-slate-300">Urgente</button>
-                </div>
-            </div>
-
-            <!-- Dynamic Equipment Cards List Container -->
-            <div id="equipment-list-container" class="space-y-3">
-                <!-- Equipment items injected via JS -->
-            </div>
-        </section>
-
-        <section id="view-new-equipment" class="space-y-5 hidden">
-            <div class="space-y-1">
-                <h2 class="text-xl font-extrabold text-navy-900">Novo Equipamento</h2>
-                <p class="text-xs text-slate-500">Preencha os dados para registrar um novo ativo de refrigeração.</p>
-            </div>
-
-            <form id="form-new-equipment" onsubmit="saveNewEquipment(event)" class="space-y-4 text-xs font-semibold">
-                <!-- Marca -->
-                <div class="space-y-1">
-                    <label class="uppercase tracking-wider text-slate-500">MARCA</label>
-                    <div class="relative">
-                        <select id="eq-brand" required class="w-full bg-slate-200/70 border-0 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 appearance-none">
-                            <option value="">Selecione a marca</option>
-                            <option value="Hisense">Hisense</option>
-                            <option value="Carrier">Carrier</option>
-                            <option value="Daikin">Daikin</option>
-                            <option value="Trane">Trane</option>
-                            <option value="LG">LG</option>
-                            <option value="Midea">Midea</option>
-                            <option value="Springer">Springer</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-3.5 top-3.5 text-slate-500 pointer-events-none"></i>
-                    </div>
-                </div>
-
-                <!-- Modelo & Tag -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="uppercase tracking-wider text-slate-500">TAG / ID</label>
-                        <input type="text" id="eq-tag" placeholder="Ex: AC-77B4" required class="w-full bg-slate-200/70 border-0 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="uppercase tracking-wider text-slate-500">MODELO</label>
-                        <input type="text" id="eq-model" placeholder="Ex: ACJ 7.5K" required class="w-full bg-slate-200/70 border-0 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400">
-                    </div>
-                </div>
-
-                <!-- Número de Série com Botão Scan -->
-                <div class="space-y-1">
-                    <label class="uppercase tracking-wider text-slate-500">NÚMERO DE SÉRIE</label>
-                    <div class="relative flex items-center">
-                        <input type="text" id="eq-sn" placeholder="ABC-123456789" required class="w-full bg-slate-200/70 border-0 rounded-xl p-3 pr-20 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400">
-                        <button type="button" onclick="simulateScan()" class="absolute right-2 text-navy-800 bg-white px-2.5 py-1.5 rounded-lg shadow-sm font-bold text-xs flex items-center gap-1">
-                            <i class="fa-solid fa-qrcode"></i> SCAN
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Data de Instalação e Capacidade BTUs -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="uppercase tracking-wider text-slate-500">BTUS</label>
-                        <input type="text" id="eq-btus" placeholder="Ex: 7500 / 12000" class="w-full bg-slate-200/70 border-0 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="uppercase tracking-wider text-slate-500">GÁS REFRIGERANTE</label>
-                        <input type="text" id="eq-gas" placeholder="Ex: R-410A / R-22" class="w-full bg-slate-200/70 border-0 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400">
-                    </div>
-                </div>
-
-                <!-- Sala & Cliente -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="uppercase tracking-wider text-slate-500">Nº DA SALA / LOCAL</label>
-                        <input type="text" id="eq-room" placeholder="Ex: Sala 102" required class="w-full bg-slate-200/70 border-0 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="uppercase tracking-wider text-slate-500">CLIENTE / EMPRESA</label>
-                        <input type="text" id="eq-client" placeholder="Nome do Cliente" required class="w-full bg-slate-200/70 border-0 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400">
-                    </div>
-                </div>
-
-                <!-- Foto da Etiqueta Opcional -->
-                <div class="space-y-1">
-                    <label class="uppercase tracking-wider text-slate-500">REGISTRO FOTOGRÁFICO DA ETIQUETA</label>
-                    <div onclick="triggerImageUpload('eq-photo-input')" class="border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 p-5 text-center cursor-pointer hover:bg-slate-100 transition flex flex-col items-center justify-center space-y-2">
-                        <input type="file" id="eq-photo-input" accept="image/*" class="hidden" onchange="handleImagePreview(event, 'eq-photo-preview')">
-                        <div class="w-12 h-12 bg-navy-900 text-white rounded-full flex items-center justify-center text-lg shadow">
-                            <i class="fa-solid fa-camera"></i>
+                <div class="space-y-2 text-xs font-semibold">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TAG / IDENTIFICAÇÃO *</label>
+                            <input type="text" id="eq-tag" required placeholder="Ex: ACJ-7.5K-01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
-                        <span class="text-slate-600 font-medium">Tirar ou carregar foto da etiqueta</span>
-                        <img id="eq-photo-preview" class="hidden max-h-32 rounded-lg object-contain shadow-md mt-2">
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">EQUIPAMENTO *</label>
+                            <input type="text" id="eq-type" required placeholder="Ex: Ar Condicionado ACJ" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">MARCA *</label>
+                            <select id="eq-brand" required class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                                <option value="">Selecione a marca</option>
+                                <option value="Hisense">Hisense</option>
+                                <option value="Carrier">Carrier</option>
+                                <option value="Daikin">Daikin</option>
+                                <option value="Trane">Trane</option>
+                                <option value="LG">LG</option>
+                                <option value="Midea">Midea</option>
+                                <option value="Springer">Springer</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">MODELO *</label>
+                            <input type="text" id="eq-model" required placeholder="Ex: HIS-7500-A" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        </div>
+                    </div>
+
+                    <!-- Número de Série + Botão Scan simulado -->
+                    <div>
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">NÚMERO DE SÉRIE *</label>
+                        <div class="relative flex items-center">
+                            <input type="text" id="eq-sn" required placeholder="Ex: S/N 998234-AX01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 pr-20 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <button type="button" onclick="simulateSNScan()" class="absolute right-1 text-navy-900 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-qrcode text-sky-600"></i> SCAN
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">Nº DA SALA / LOCAL *</label>
+                            <input type="text" id="eq-room" required placeholder="Ex: Sala 102" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        </div>
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">CAPACIDADE (BTUS)</label>
+                            <input type="text" id="eq-btus" placeholder="Ex: 7500 BTUs" value="7.500 BTUs" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">GÁS REFRIGERANTE</label>
+                            <input type="text" id="eq-gas" placeholder="Ex: R-410A / R-32" value="R-410A" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        </div>
+                        <div>
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">ÁREA CLIMATIZADA</label>
+                            <input type="text" id="eq-area" placeholder="Ex: 25 m²" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">OCUPANTES (FIXOS/VARIÁVEIS)</label>
+                        <input type="text" id="eq-occupants" placeholder="Ex: 4 Fixos / 10 Variáveis" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                    </div>
+
+                    <!-- Foto da Etiqueta Opcional -->
+                    <div class="pt-2">
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px] font-bold">FOTO DA ETIQUETA DO EQUIPAMENTO</label>
+                        <div onclick="document.getElementById('eq-photo-file').click()" class="border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 p-4 text-center cursor-pointer hover:bg-slate-100 transition flex flex-col items-center justify-center space-y-1 mt-1">
+                            <input type="file" id="eq-photo-file" accept="image/*" class="hidden" onchange="handleLabelPhotoUpload(event)">
+                            <div class="w-10 h-10 bg-navy-900 text-sky-400 rounded-full flex items-center justify-center text-base shadow">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <span class="text-slate-600 font-semibold text-xs">Anexar foto da placa/etiqueta</span>
+                            <span id="eq-photo-status" class="text-[10px] text-slate-400">Nenhuma foto selecionada</span>
+                            <img id="eq-photo-preview" class="hidden max-h-32 rounded-lg object-contain shadow-md mt-2">
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="w-full bg-navy-900 hover:bg-navy-800 text-white py-3.5 rounded-xl font-bold text-sm tracking-wider uppercase shadow-md flex items-center justify-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-floppy-disk"></i> SALVAR EQUIPAMENTO
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b pb-2 border-slate-100">
+                    <h2 class="text-xs font-extrabold text-navy-900 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-emerald-600"></i> SERVIÇO EXECUTADO (CHECKLIST)
+                    </h2>
+                    <span id="checklist-counter" class="text-[11px] font-bold text-navy-900 bg-slate-100 px-2.5 py-0.5 rounded-full">0/11 OK</span>
+                </div>
+
+                <p class="text-[11px] text-slate-500">Marque o status de cada item, adicione observações, foto ou orçamento se necessário:</p>
+
+                <!-- Container dinâmico com todos os 11 itens do PDF -->
+                <div id="checklist-items-container" class="space-y-3">
+                    <!-- Populado via JS -->
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-xs font-extrabold text-navy-900 uppercase tracking-wider flex items-center gap-2 border-b pb-2 border-slate-100">
+                    <i class="fa-solid fa-pen-to-square text-amber-500"></i> CONCLUSÃO E OBSERVAÇÕES
+                </h2>
+
+                <div class="space-y-1.5">
+                    <label class="uppercase tracking-wider text-slate-500 font-bold text-[10px]">OBSERVAÇÕES TÉCNICAS GERAIS</label>
+                    <textarea id="general-obs" rows="3" placeholder="Adicione detalhes sobre o serviço efetuado, falhas encontradas ou recomendações..." class="w-full bg-slate-100 border-0 rounded-xl p-3 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 resize-none"></textarea>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full bg-navy-900 hover:bg-navy-800 text-white py-4 rounded-2xl font-extrabold text-sm tracking-wider uppercase shadow-lg flex items-center justify-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-file-pdf text-amber-400 text-lg"></i> GERAR RELATÓRIO PDF
                 </button>
-            </form>
-        </section>
-
-        <section id="view-checklist" class="space-y-5 hidden">
-            <!-- Active Checklist Header Banner -->
-            <div class="bg-slate-200/70 p-4 rounded-2xl space-y-1 flex items-center justify-between border border-slate-200">
-                <div>
-                    <span class="text-xs font-bold text-sky-700 tracking-wider uppercase" id="ck-tag">ID: AC-789-X</span>
-                    <h2 class="text-base font-extrabold text-navy-900 leading-tight" id="ck-title">Compressor Principal A1</h2>
-                    <p class="text-xs text-slate-600 font-medium flex items-center gap-1" id="ck-sub">
-                        <i class="fa-solid fa-building text-slate-400"></i> <span id="ck-location">Sala de Máquinas Sul</span>
-                    </p>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-navy-900 text-white flex items-center justify-center font-bold shadow">
-                    <i class="fa-solid fa-fan"></i>
-                </div>
             </div>
 
-            <!-- Progress Indicator Bar -->
-            <div class="space-y-1">
-                <div class="flex justify-between text-xs font-bold">
-                    <span class="text-slate-500 uppercase tracking-wider">PROGRESSO</span>
-                    <span id="checklist-progress-text" class="text-navy-900">0/11</span>
-                </div>
-                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                    <div id="checklist-progress-bar" class="bg-navy-800 h-full w-0 transition-all duration-300"></div>
-                </div>
-            </div>
-
-            <!-- Checklist Item Accordion/List -->
-            <div id="checklist-tasks-container" class="space-y-3">
-                <!-- Dynamically populated from PDF checklist items -->
-            </div>
-
-            <!-- Technical Notes Textarea -->
-            <div class="space-y-1.5">
-                <label class="uppercase tracking-wider text-slate-500 font-bold text-xs">OBSERVAÇÕES TÉCNICAS GERAIS</label>
-                <textarea id="ck-general-obs" rows="3" placeholder="Adicione detalhes sobre anomalias, substituições de peças ou observações adicionais..." class="w-full bg-slate-200/70 border-0 rounded-2xl p-3 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-navy-900 placeholder-slate-400 resize-none"></textarea>
-            </div>
-
-            <!-- Digital Signature Section -->
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 space-y-4">
-                <h3 class="font-bold text-navy-900 text-xs uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-signature text-amber-500"></i> ASSINATURAS DO RELATÓRIO
-                </h3>
-                
-                <!-- Technician Signature -->
-                <div class="space-y-1">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-semibold text-slate-600">Assinatura do Técnico</span>
-                        <button type="button" onclick="clearSignature('tech-sig-canvas')" class="text-rose-600 text-[11px] font-bold">Limpar</button>
-                    </div>
-                    <canvas id="tech-sig-canvas" width="320" height="100" class="signature-canvas w-full rounded-xl"></canvas>
-                </div>
-
-                <!-- Client Signature -->
-                <div class="space-y-1">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-semibold text-slate-600">Assinatura do Cliente / Responsável</span>
-                        <button type="button" onclick="clearSignature('client-sig-canvas')" class="text-rose-600 text-[11px] font-bold">Limpar</button>
-                    </div>
-                    <canvas id="client-sig-canvas" width="320" height="100" class="signature-canvas w-full rounded-xl"></canvas>
-                </div>
-            </div>
-
-            <!-- Action Buttons: Generate PDF & Finish -->
-            <div class="space-y-2 pt-2">
-                <button type="button" onclick="finalizeMaintenanceAndGeneratePDF()" class="w-full bg-navy-900 hover:bg-navy-800 text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition active:scale-95">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i> FINALIZAR E GERAR RELATÓRIO PDF
-                </button>
-            </div>
-        </section>
-
-        <section id="view-history" class="space-y-4 hidden">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-extrabold text-navy-900">Histórico de Relatórios</h2>
-                    <p class="text-xs text-slate-500">Relatórios de manutenção finalizados e PDFs emissores</p>
-                </div>
-            </div>
-
-            <!-- History Cards List -->
-            <div id="history-reports-list" class="space-y-3">
-                <!-- History elements injected via JS -->
-            </div>
-        </section>
+        </form>
 
     </main>
 
     <div class="fixed top-[-9999px] left-[-9999px]">
-        <div id="pdf-export-template" class="w-[800px] bg-white p-8 text-slate-900 font-sans text-xs border border-slate-300 space-y-4">
-            <!-- Header Table -->
+        <div id="pdf-export-template" class="w-[800px] bg-white p-6 text-slate-900 font-sans text-xs border border-slate-300 space-y-3">
+            
+            <!-- Cabeçalho PDF FRL Serviços -->
             <div class="border border-slate-900 p-3 flex justify-between items-start bg-slate-50">
                 <div class="space-y-1">
-                    <h2 class="text-lg font-bold text-navy-900">FRL SERVIÇOS DE REFRIGERAÇÃO</h2>
+                    <h2 class="text-base font-extrabold text-navy-900">FRL SERVIÇOS DE REFRIGERAÇÃO</h2>
                     <p class="text-[10px] text-slate-700">CNPJ: 58.475.400/0001-33</p>
                     <p class="text-[10px] text-slate-700">EST. Antônio Guimarães Mosqueira Nº1301 Parque Atlântico - Macaé-RJ</p>
                     <p class="text-[10px] text-slate-700">TEL: (22) 99961-5971 | E-mail: admfriservicos@gmail.com</p>
                 </div>
                 <div class="text-right">
-                    <span class="inline-block bg-navy-900 text-white font-bold px-3 py-1 text-xs rounded">PREVENTIVA ACJ / HVAC</span>
-                    <p class="text-[10px] mt-2 font-bold text-slate-600" id="pdf-doc-date">DATA: --/--/----</p>
+                    <span class="inline-block bg-navy-900 text-white font-bold px-3 py-1 text-xs rounded">PREVENTIVA HVAC</span>
+                    <p class="text-[10px] mt-2 font-bold text-slate-600" id="pdf-date-str">DATA: --/--/----</p>
                 </div>
             </div>
 
-            <!-- Dados do Empreendimento -->
-            <div class="border border-slate-900 p-3 space-y-1">
-                <h3 class="font-bold bg-slate-200 px-2 py-0.5 text-navy-900 uppercase">DADOS DO EMPREENDIMENTO / CLIENTE</h3>
-                <div class="grid grid-cols-2 gap-2 pt-1 text-[11px]">
-                    <p><strong>CLIENTE:</strong> <span id="pdf-client-name">--</span></p>
-                    <p><strong>ENDEREÇO:</strong> <span id="pdf-client-address">Macaé - RJ</span></p>
-                    <p><strong>TEL.:</strong> <span id="pdf-client-phone">(22) 99961-5971</span></p>
-                    <p><strong>RESPONSÁVEL:</strong> <span id="pdf-client-resp">--</span></p>
+            <!-- Dados do Empreendimento / Cliente -->
+            <div class="border border-slate-900 p-2.5 space-y-1">
+                <h3 class="font-bold bg-slate-200 px-2 py-0.5 text-navy-900 uppercase text-[11px]">DADOS DO EMPREENDIMENTO / CLIENTE</h3>
+                <div class="grid grid-cols-2 gap-2 pt-1 text-[10px]">
+                    <p><strong>CLIENTE:</strong> <span id="pdf-out-client">--</span></p>
+                    <p><strong>ENDEREÇO:</strong> <span id="pdf-out-address">--</span></p>
+                    <p><strong>TEL.:</strong> <span id="pdf-out-phone">--</span></p>
+                    <p><strong>RESPONSÁVEL:</strong> <span id="pdf-out-resp">--</span></p>
                 </div>
             </div>
 
             <!-- Dados do Equipamento -->
-            <div class="border border-slate-900 p-3 space-y-1">
-                <h3 class="font-bold bg-slate-200 px-2 py-0.5 text-navy-900 uppercase">DADOS DO EQUIPAMENTO</h3>
+            <div class="border border-slate-900 p-2.5 space-y-1">
+                <h3 class="font-bold bg-slate-200 px-2 py-0.5 text-navy-900 uppercase text-[11px]">DADOS DO EQUIPAMENTO</h3>
                 <div class="grid grid-cols-3 gap-2 pt-1 text-[10px]">
-                    <p><strong>TAG:</strong> <span id="pdf-eq-tag">--</span></p>
-                    <p><strong>EQUIPAMENTO:</strong> <span id="pdf-eq-name">--</span></p>
-                    <p><strong>MODELO:</strong> <span id="pdf-eq-model">--</span></p>
-                    <p><strong>Nº DA SALA:</strong> <span id="pdf-eq-room">--</span></p>
-                    <p><strong>BTUS:</strong> <span id="pdf-eq-btus">--</span></p>
-                    <p><strong>GÁS REFRIGERANTE:</strong> <span id="pdf-eq-gas">--</span></p>
+                    <p><strong>TAG:</strong> <span id="pdf-out-tag">--</span></p>
+                    <p><strong>EQUIPAMENTO:</strong> <span id="pdf-out-type">--</span></p>
+                    <p><strong>MARCA / MODELO:</strong> <span id="pdf-out-model">--</span></p>
+                    <p><strong>Nº DE SÉRIE:</strong> <span id="pdf-out-sn">--</span></p>
+                    <p><strong>Nº DA SALA:</strong> <span id="pdf-out-room">--</span></p>
+                    <p><strong>BTUS:</strong> <span id="pdf-out-btus">--</span></p>
+                    <p><strong>GÁS REFRIGERANTE:</strong> <span id="pdf-out-gas">--</span></p>
+                    <p><strong>ÁREA CLIMATIZADA:</strong> <span id="pdf-out-area">--</span></p>
+                    <p><strong>OCUPANTES:</strong> <span id="pdf-out-occupants">--</span></p>
                 </div>
             </div>
 
-            <!-- Tabela de Serviços Executados (PDF Standard Checklist Tasks) -->
+            <!-- Tabela de Itens de Checklist do PDF -->
             <div class="border border-slate-900">
-                <div class="bg-navy-900 text-white font-bold p-1.5 text-center text-xs">SERVIÇOS EXECUTADOS E CHECKLIST</div>
-                <table class="w-full border-collapse text-[10px]" id="pdf-tasks-table">
+                <div class="bg-navy-900 text-white font-bold p-1 text-center text-xs">SERVIÇO EXECUTADO E CHECKLIST</div>
+                <table class="w-full border-collapse text-[9px]">
                     <thead>
-                        <tr class="bg-slate-200 text-slate-800 border-b border-slate-900">
+                        <tr class="bg-slate-200 text-slate-900 border-b border-slate-900 font-bold">
                             <th class="p-1 border-r border-slate-900 text-left w-1/2">Item de Inspeção / Tarefa</th>
-                            <th class="p-1 border-r border-slate-900 text-center w-20">Status</th>
-                            <th class="p-1 border-r border-slate-900 text-left">Obs / Foto / Orçamento</th>
+                            <th class="p-1 border-r border-slate-900 text-center w-16">Status</th>
+                            <th class="p-1 text-left">Observações / Orçamento / Foto</th>
                         </tr>
                     </thead>
-                    <tbody id="pdf-tasks-body">
-                        <!-- Populated dynamic rows -->
+                    <tbody id="pdf-out-tasks-body">
+                        <!-- Popilado dinamicamente -->
                     </tbody>
                 </table>
             </div>
 
             <!-- Observações Gerais -->
             <div class="border border-slate-900 p-2 space-y-1">
-                <h4 class="font-bold text-navy-900">OBSERVAÇÕES TÉCNICAS:</h4>
-                <p id="pdf-obs-text" class="text-[10px] text-slate-700 min-h-[40px]">Nenhuma observação técnica registrada.</p>
+                <h4 class="font-bold text-navy-900 text-[10px]">OBSERVAÇÕES TÉCNICAS GERAIS:</h4>
+                <p id="pdf-out-general-obs" class="text-[10px] text-slate-800 min-h-[30px]">Nenhuma observação técnica adicional.</p>
             </div>
 
-            <!-- Assinaturas e Rodapé -->
-            <div class="border border-slate-900 p-4 grid grid-cols-2 gap-8 text-center pt-6">
-                <div>
-                    <div id="pdf-tech-sig-img" class="h-12 flex items-center justify-center mb-1"></div>
-                    <div class="border-t border-slate-800 pt-1 font-bold text-[10px] uppercase">ASSINATURA TÉCNICO</div>
-                </div>
-                <div>
-                    <div id="pdf-client-sig-img" class="h-12 flex items-center justify-center mb-1"></div>
-                    <div class="border-t border-slate-800 pt-1 font-bold text-[10px] uppercase">ASSINATURA CLIENTE</div>
-                </div>
+            <!-- Foto da Etiqueta no PDF (se anexada) -->
+            <div id="pdf-out-photo-container" class="border border-slate-900 p-2 hidden">
+                <h4 class="font-bold text-navy-900 text-[10px] mb-1">REGISTRO FOTOGRÁFICO DA ETIQUETA:</h4>
+                <div id="pdf-out-photo-img" class="flex justify-center"></div>
             </div>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 pb-safe shadow-lg">
-        <div class="max-w-md mx-auto grid grid-cols-4 text-center text-xs font-semibold py-2">
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item flex flex-col items-center justify-center text-navy-900 space-y-1">
-                <i class="fa-solid fa-border-all text-base"></i>
-                <span class="text-[10px]">Dashboard</span>
-            </button>
-            <button onclick="switchView('equipments')" id="nav-equipments" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-navy-900 space-y-1">
-                <i class="fa-solid fa-list text-base"></i>
-                <span class="text-[10px]">Equipamentos</span>
-            </button>
-            <button onclick="switchView('new-equipment')" id="nav-new-equipment" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-navy-900 space-y-1">
-                <i class="fa-solid fa-circle-plus text-base"></i>
-                <span class="text-[10px]">Novo</span>
-            </button>
-            <button onclick="switchView('history')" id="nav-history" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-navy-900 space-y-1">
-                <i class="fa-solid fa-clock-rotate-left text-base"></i>
-                <span class="text-[10px]">Histórico</span>
-            </button>
-        </div>
-    </nav>
-
     <script>
-        // Configuração e registro do PWA com nome "FRL serviços"
-        (function initPWA() {
-            const manifestData = {
-                "name": "FRL serviços",
-                "short_name": "FRL serviços",
-                "description": "Sistema de Checklist e Manutenção HVAC - FRL serviços",
-                "start_url": "./",
-                "display": "standalone",
-                "background_color": "#001E35",
-                "theme_color": "#002B49",
-                "icons": [
-                    {
-                        "src": "icon-192.png",
-                        "sizes": "192x192",
-                        "type": "image/png",
-                        "purpose": "any maskable"
-                    },
-                    {
-                        "src": "icon-512.png",
-                        "sizes": "512x512",
-                        "type": "image/png",
-                        "purpose": "any maskable"
-                    }
-                ]
-            };
+        // Registra o Service Worker físico (sw.js)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW registrado com sucesso:', reg.scope))
+                    .catch(err => console.log('Falha ao registrar SW:', err));
+            });
+        }
 
-            // Injeta o manifest inline
-            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-            const manifestURL = URL.createObjectURL(manifestBlob);
-            let link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestURL;
-            document.head.appendChild(link);
+        // PWA Prompt Event handling
+        let deferredPwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.remove('hidden');
+        });
 
-            // Registro do Service Worker inline para PWA no Android/iOS
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    const CACHE_NAME = 'frl-servicos-v1';
-                    const urlsToCache = ['./', 'index.html'];
-
-                    self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-                        );
-                        self.skipWaiting();
-                    });
-
-                    self.addEventListener('activate', event => {
-                        event.waitUntil(clients.claim());
-                    });
-
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request).then(response => {
-                                return response || fetch(event.request);
-                            })
-                        );
-                    });
-                `;
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                const swURL = URL.createObjectURL(swBlob);
-
-                navigator.serviceWorker.register(swURL).catch(() => {
-                    // Fallback caso o usuário prefira ler o arquivo local sw.js
-                    navigator.serviceWorker.register('./sw.js').catch(() => {});
+        function handleInstallClick() {
+            if (deferredPwaPrompt) {
+                deferredPwaPrompt.prompt();
+                deferredPwaPrompt.userChoice.then((choice) => {
+                    deferredPwaPrompt = null;
+                    dismissPwaBanner();
                 });
+            } else {
+                openInstallModal();
             }
-        })();
+        }
 
+        function dismissPwaBanner() {
+            document.getElementById('pwa-install-banner').classList.add('hidden');
+        }
+
+        function openInstallModal() {
+            document.getElementById('install-instructions-modal').classList.remove('hidden');
+        }
+
+        function closeInstallModal() {
+            document.getElementById('install-instructions-modal').classList.add('hidden');
+        }
+
+        // 11 Itens de inspeção oficiais do PDF
         const PDF_CHECKLIST_TASKS = [
             "Verificar se todas as funções estão operando",
             "Limpar o filtro de ar",
-            "Verificar se a água de condensação está sendo drenada livremente",
+            "Verificar se a água de condensação está sendo drenada livremente.",
             "Efetuar a limpeza da bandeja de drenagem",
-            "Efetuar reaperto dos conectores elétricos",
+            "Efetuar reaperto dos conectores elétricos.",
             "Verificar se existe superaquecimento de cabos ou conectores. Eliminar ou substituir",
-            "Verificar o funcionamento dos dispositivos de proteção e acionamento",
+            "Verificar o funcionamento dos dispositivos de proteção e acionamento.",
             "Lavar a serpentina da unidade evaporadora",
             "Lavar a Unidade Condensadora - Externa",
             "Verificar a isolação elétrica de motores e compressores",
             "Medir pressões de funcionamento"
         ];
 
-        let equipmentsData = [
-            {
-                id: "AC-77B4",
-                brand: "Carrier",
-                model: "38KCV",
-                sn: "998234-AX01",
-                lastMaint: "12/08/2023",
-                nextMaint: "12/02/2024",
-                status: "em-dia",
-                client: "Petrobras Macaé",
-                room: "Sala 101",
-                btus: "12000 BTUs",
-                gas: "R-410A",
-                img: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=300"
-            },
-            {
-                id: "AC-92V1",
-                brand: "Daikin",
-                model: "VRV IV",
-                sn: "DK-4451-99B",
-                lastMaint: "05/01/2023",
-                nextMaint: "Atrasado (05/07/2023)",
-                status: "pendente",
-                client: "Atlântico Plaza",
-                room: "Auditório Principal",
-                btus: "18000 BTUs",
-                gas: "R-32",
-                img: "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&q=80&w=300"
-            },
-            {
-                id: "EX-11M9",
-                brand: "Trane",
-                model: "Chiller Aqua",
-                sn: "TR-999-ZXY",
-                lastMaint: "01/10/2023",
-                nextMaint: "Urgente",
-                status: "urgente",
-                issue: "Vazamento de Gás",
-                client: "Hospital Macaé",
-                room: "UTI Bloco B",
-                btus: "60000 BTUs",
-                gas: "R-134a",
-                img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=300"
-            }
-        ];
-
-        let activeChecklistState = {};
-        let activeEquipment = null;
-        let activeFilter = 'all';
-        let deferredPwaPrompt = null;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPwaPrompt = e;
-            document.getElementById('pwa-install-banner').classList.remove('hidden');
-        });
-
-        function triggerPwaInstall() {
-            if (deferredPwaPrompt) {
-                deferredPwaPrompt.prompt();
-                deferredPwaPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('Usuário aceitou a instalação PWA');
-                    }
-                    deferredPwaPrompt = null;
-                    dismissPwaBanner();
-                });
-            } else {
-                alert('Para instalar no seu celular ou browser: acesse pelo Chrome/Safari e clique em "Adicionar à Tela de Início" ou "Instalar App".');
-            }
-        }
-
-        function dismissPwaBanner() {
-            const banner = document.getElementById('pwa-install-banner');
-            banner.style.display = 'none';
-        }
+        let taskState = {};
+        let labelPhotoBase64 = null;
 
         window.onload = function() {
-            renderEquipmentList();
-            setupSignatureCanvases();
+            renderChecklistItems();
         };
 
-        function switchView(viewId) {
-            const views = ['dashboard', 'equipments', 'new-equipment', 'checklist', 'history'];
-            views.forEach(v => {
-                const el = document.getElementById('view-' + v);
-                if (el) el.classList.add('hidden');
-                
-                const navBtn = document.getElementById('nav-' + v);
-                if (navBtn) {
-                    navBtn.classList.remove('text-navy-900');
-                    navBtn.classList.add('text-slate-400');
-                }
-            });
-
-            const activeView = document.getElementById('view-' + viewId);
-            if (activeView) activeView.classList.remove('hidden');
-
-            const activeNav = document.getElementById('nav-' + viewId);
-            if (activeNav) {
-                activeNav.classList.remove('text-slate-400');
-                activeNav.classList.add('text-navy-900');
-            }
-
-            // Update title
-            const headerTitle = document.getElementById('header-title');
-            if (viewId === 'dashboard') headerTitle.innerText = 'FRL serviços';
-            if (viewId === 'equipments') headerTitle.innerText = 'EQUIPAMENTOS';
-            if (viewId === 'new-equipment') headerTitle.innerText = 'NOVO CADASTRO';
-            if (viewId === 'checklist') headerTitle.innerText = 'CHECKLIST ATIVO';
-            if (viewId === 'history') headerTitle.innerText = 'HISTÓRICO';
-        }
-
-        function renderEquipmentList() {
-            const container = document.getElementById('equipment-list-container');
+        function renderChecklistItems() {
+            const container = document.getElementById('checklist-items-container');
             container.innerHTML = '';
 
-            const query = document.getElementById('equipment-search')?.value.toLowerCase() || '';
-
-            const filtered = equipmentsData.filter(item => {
-                const matchesSearch = item.id.toLowerCase().includes(query) || 
-                                      item.brand.toLowerCase().includes(query) || 
-                                      item.model.toLowerCase().includes(query) ||
-                                      item.sn.toLowerCase().includes(query);
-                const matchesFilter = activeFilter === 'all' || item.status === activeFilter;
-                return matchesSearch && matchesFilter;
-            });
-
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-slate-400">
-                        <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
-                        <p class="text-xs">Nenhum equipamento encontrado.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            filtered.forEach(eq => {
-                let badgeHTML = '';
-                if (eq.status === 'em-dia') {
-                    badgeHTML = `<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[11px] font-bold rounded-full flex items-center gap-1"><i class="fa-solid fa-circle-check text-xs"></i> Em dia</span>`;
-                } else if (eq.status === 'pendente') {
-                    badgeHTML = `<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[11px] font-bold rounded-full flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation text-xs"></i> Pendente</span>`;
-                } else {
-                    badgeHTML = `<span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-[11px] font-bold rounded-full flex items-center gap-1"><i class="fa-solid fa-circle-exclamation text-xs"></i> Urgente</span>`;
-                }
-
-                const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3";
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="px-2.5 py-1 bg-slate-100 font-bold text-slate-700 text-xs rounded-lg">${eq.id}</span>
-                        ${badgeHTML}
-                    </div>
-                    <div class="flex space-x-3 items-center">
-                        <img src="${eq.img}" alt="${eq.brand}" class="w-16 h-16 rounded-xl object-cover border border-slate-200" onerror="this.src='https://placehold.co/100x100/002B49/FFFFFF?text=HVAC'">
-                        <div>
-                            <h3 class="font-bold text-navy-900 text-sm">${eq.brand} ${eq.model}</h3>
-                            <p class="text-xs text-slate-500 font-medium">S/N: ${eq.sn}</p>
-                            <p class="text-[11px] text-slate-400">${eq.client} - ${eq.room}</p>
-                        </div>
-                    </div>
-                    ${eq.issue ? `
-                        <div class="bg-rose-50 border border-rose-200 p-2.5 rounded-xl flex items-center justify-between">
-                            <span class="text-xs font-bold text-rose-700">FALHA: ${eq.issue}</span>
-                            <button onclick="startChecklistFor('${eq.id}')" class="bg-rose-700 text-white text-xs font-bold px-3 py-1 rounded-lg">Atender</button>
-                        </div>
-                    ` : `
-                        <div class="bg-slate-50 p-2.5 rounded-xl text-xs flex justify-between items-center text-slate-600">
-                            <div>
-                                <p class="text-[10px] text-slate-400 uppercase font-bold">PRÓXIMA MANUTENÇÃO</p>
-                                <p class="font-semibold ${eq.status === 'pendente' ? 'text-rose-600' : 'text-slate-800'}">${eq.nextMaint}</p>
-                            </div>
-                            <button onclick="startChecklistFor('${eq.id}')" class="bg-navy-900 text-white font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-navy-800 transition">Inspecionar</button>
-                        </div>
-                    `}
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function setFilter(filter) {
-            activeFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('bg-navy-900', 'text-white', 'shadow-sm');
-                btn.classList.add('bg-slate-200', 'text-slate-700');
-            });
-            event.target.classList.remove('bg-slate-200', 'text-slate-700');
-            event.target.classList.add('bg-navy-900', 'text-white', 'shadow-sm');
-            renderEquipmentList();
-        }
-
-        function filterEquipments() {
-            renderEquipmentList();
-        }
-
-        function simulateScan() {
-            const mockSerials = ["HS-7500-2026-X", "CR-12000-A99", "DK-VRV-98765"];
-            const randomSN = mockSerials[Math.floor(Math.random() * mockSerials.length)];
-            document.getElementById('eq-sn').value = randomSN;
-        }
-
-        function saveNewEquipment(e) {
-            e.preventDefault();
-            const brand = document.getElementById('eq-brand').value;
-            const model = document.getElementById('eq-model').value;
-            const tag = document.getElementById('eq-tag').value;
-            const sn = document.getElementById('eq-sn').value;
-            const room = document.getElementById('eq-room').value;
-            const client = document.getElementById('eq-client').value;
-            const btus = document.getElementById('eq-btus').value || '7.5K BTUs';
-            const gas = document.getElementById('eq-gas').value || 'R-410A';
-
-            const newEq = {
-                id: tag || `AC-${Math.floor(Math.random()*8999+1000)}`,
-                brand: brand,
-                model: model,
-                sn: sn,
-                lastMaint: new Date().toLocaleDateString('pt-BR'),
-                nextMaint: "Em dia",
-                status: "em-dia",
-                client: client,
-                room: room,
-                btus: btus,
-                gas: gas,
-                img: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=300"
-            };
-
-            equipmentsData.unshift(newEq);
-            alert('Equipamento salvo com sucesso!');
-            document.getElementById('form-new-equipment').reset();
-            renderEquipmentList();
-            switchView('equipments');
-        }
-
-        function startChecklistFor(eqId) {
-            activeEquipment = equipmentsData.find(e => e.id === eqId) || equipmentsData[0];
-            activeChecklistState = {};
-
-            document.getElementById('ck-tag').innerText = `TAG / ID: ${activeEquipment.id}`;
-            document.getElementById('ck-title').innerText = `${activeEquipment.brand} ${activeEquipment.model}`;
-            document.getElementById('ck-location').innerText = `${activeEquipment.client} (${activeEquipment.room})`;
-
-            renderChecklistTasks();
-            updateChecklistProgress();
-            switchView('checklist');
-        }
-
-        function renderChecklistTasks() {
-            const container = document.getElementById('checklist-tasks-container');
-            container.innerHTML = '';
-
-            PDF_CHECKLIST_TASKS.forEach((task, index) => {
-                activeChecklistState[index] = {
-                    checked: false,
+            PDF_CHECKLIST_TASKS.forEach((taskTitle, idx) => {
+                taskState[idx] = {
+                    status: 'OK',
                     obs: '',
                     budget: '',
                     photo: null
                 };
 
-                const card = document.createElement('div');
-                card.className = "bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-3 transition";
-                card.id = `task-card-${index}`;
-                card.innerHTML = `
-                    <div class="flex items-start space-x-3">
-                        <input type="checkbox" id="chk-task-${index}" onchange="toggleTaskChecked(${index})" class="w-5 h-5 mt-0.5 rounded border-slate-300 text-navy-900 focus:ring-navy-900 cursor-pointer">
-                        <label for="chk-task-${index}" class="text-xs font-semibold text-slate-800 flex-grow cursor-pointer leading-tight">
-                            ${index + 1}. ${task}
-                        </label>
+                const itemCard = document.createElement('div');
+                itemCard.className = "bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 text-xs";
+                itemCard.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <span class="font-bold text-slate-800 text-xs leading-snug flex-grow">
+                            ${idx + 1}. ${taskTitle}
+                        </span>
+                        <select onchange="updateTaskStatus(${idx}, this.value)" class="bg-white border border-slate-300 rounded-lg text-[11px] font-bold p-1 text-navy-900 focus:ring-navy-900">
+                            <option value="OK" selected>✓ OK</option>
+                            <option value="PENDENTE">⚠ PENDENTE</option>
+                            <option value="N/A">N/A</option>
+                        </select>
                     </div>
 
-                    <!-- Expandable details for observations, budget, and photo -->
-                    <div class="pl-8 space-y-2">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" placeholder="Obs / Detalhes" oninput="updateTaskObs(${index}, this.value)" class="bg-slate-100 border-0 rounded-lg p-2 text-xs text-slate-800 placeholder-slate-400">
-                            <input type="text" placeholder="Orçamento R$" oninput="updateTaskBudget(${index}, this.value)" class="bg-slate-100 border-0 rounded-lg p-2 text-xs text-slate-800 placeholder-slate-400">
-                        </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <input type="text" placeholder="Obs / Detalhes..." oninput="updateTaskObs(${idx}, this.value)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-[11px] text-slate-800 placeholder-slate-400">
+                        <input type="text" placeholder="Orçamento R$..." oninput="updateTaskBudget(${idx}, this.value)" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-[11px] text-slate-800 placeholder-slate-400">
+                    </div>
 
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="triggerTaskPhoto(${index})" class="bg-slate-100 hover:bg-slate-200 text-navy-900 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-slate-200">
-                                <i class="fa-solid fa-camera text-sky-600"></i> Anexar Foto
-                            </button>
-                            <span id="photo-indicator-${index}" class="text-[11px] text-slate-400 italic">Sem foto</span>
-                            <input type="file" id="task-photo-input-${index}" accept="image/*" class="hidden" onchange="handleTaskPhotoUpload(event, ${index})">
-                        </div>
+                    <div class="flex items-center gap-2 pt-0.5">
+                        <button type="button" onclick="triggerTaskPhotoInput(${idx})" class="bg-white hover:bg-slate-100 text-navy-900 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 border border-slate-200 shadow-sm">
+                            <i class="fa-solid fa-camera text-sky-600"></i> Anexar Foto
+                        </button>
+                        <span id="task-photo-label-${idx}" class="text-[10px] text-slate-400 italic">Sem foto</span>
+                        <input type="file" id="task-photo-input-${idx}" accept="image/*" class="hidden" onchange="handleTaskPhotoUpload(event, ${idx})">
                     </div>
                 `;
-                container.appendChild(card);
+                container.appendChild(itemCard);
             });
+
+            updateChecklistCounter();
         }
 
-        function toggleTaskChecked(index) {
-            const chk = document.getElementById(`chk-task-${index}`).checked;
-            activeChecklistState[index].checked = chk;
-            const card = document.getElementById(`task-card-${index}`);
-            if (chk) {
-                card.classList.add('bg-slate-50', 'border-emerald-200');
-            } else {
-                card.classList.remove('bg-slate-50', 'border-emerald-200');
-            }
-            updateChecklistProgress();
+        function updateTaskStatus(idx, val) {
+            taskState[idx].status = val;
+            updateChecklistCounter();
         }
 
-        function updateTaskObs(index, val) {
-            activeChecklistState[index].obs = val;
+        function updateTaskObs(idx, val) {
+            taskState[idx].obs = val;
         }
 
-        function updateTaskBudget(index, val) {
-            activeChecklistState[index].budget = val;
+        function updateTaskBudget(idx, val) {
+            taskState[idx].budget = val;
         }
 
-        function triggerTaskPhoto(index) {
-            document.getElementById(`task-photo-input-${index}`).click();
+        function triggerTaskPhotoInput(idx) {
+            document.getElementById(`task-photo-input-${idx}`).click();
         }
 
-        function handleTaskPhotoUpload(e, index) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    activeChecklistState[index].photo = event.target.result;
-                    document.getElementById(`photo-indicator-${index}`).innerText = "✓ Foto Anexada";
-                    document.getElementById(`photo-indicator-${index}`).className = "text-[11px] text-emerald-600 font-bold";
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function updateChecklistProgress() {
-            const total = PDF_CHECKLIST_TASKS.length;
-            const completed = Object.values(activeChecklistState).filter(t => t.checked).length;
-            document.getElementById('checklist-progress-text').innerText = `${completed}/${total}`;
-            const pct = (completed / total) * 100;
-            document.getElementById('checklist-progress-bar').style.width = `${pct}%`;
-        }
-
-        function triggerImageUpload(id) {
-            document.getElementById(id).click();
-        }
-
-        function handleImagePreview(e, previewId) {
+        function handleTaskPhotoUpload(e, idx) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    const preview = document.getElementById(previewId);
-                    preview.src = evt.target.result;
-                    preview.classList.remove('hidden');
+                    taskState[idx].photo = evt.target.result;
+                    const label = document.getElementById(`task-photo-label-${idx}`);
+                    label.innerText = "✓ Foto Anexada";
+                    label.className = "text-[10px] text-emerald-600 font-bold";
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function setupSignatureCanvases() {
-            ['tech-sig-canvas', 'client-sig-canvas'].forEach(id => {
-                const canvas = document.getElementById(id);
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-                let drawing = false;
-
-                function getPos(e) {
-                    const rect = canvas.getBoundingClientRect();
-                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                    return { x: clientX - rect.left, y: clientY - rect.top };
-                }
-
-                function startDraw(e) {
-                    drawing = true;
-                    const pos = getPos(e);
-                    ctx.beginPath();
-                    ctx.moveTo(pos.x, pos.y);
-                }
-
-                function moveDraw(e) {
-                    if (!drawing) return;
-                    const pos = getPos(e);
-                    ctx.lineTo(pos.x, pos.y);
-                    ctx.strokeStyle = '#002B49';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-
-                function stopDraw() { drawing = false; }
-
-                canvas.addEventListener('mousedown', startDraw);
-                canvas.addEventListener('mousemove', moveDraw);
-                canvas.addEventListener('mouseup', stopDraw);
-                canvas.addEventListener('touchstart', startDraw, { passive: true });
-                canvas.addEventListener('touchmove', moveDraw, { passive: true });
-                canvas.addEventListener('touchend', stopDraw);
-            });
+        function handleLabelPhotoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    labelPhotoBase64 = evt.target.result;
+                    const preview = document.getElementById('eq-photo-preview');
+                    preview.src = labelPhotoBase64;
+                    preview.classList.remove('hidden');
+                    document.getElementById('eq-photo-status').innerText = "✓ Foto da etiqueta carregada";
+                    document.getElementById('eq-photo-status').className = "text-[10px] text-emerald-600 font-bold";
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
-        function clearSignature(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function updateChecklistCounter() {
+            const okCount = Object.values(taskState).filter(t => t.status === 'OK').length;
+            document.getElementById('checklist-counter').innerText = `${okCount}/11 OK`;
         }
 
-        async function finalizeMaintenanceAndGeneratePDF() {
-            if (!activeEquipment) activeEquipment = equipmentsData[0];
+        function simulateSNScan() {
+            const mockSerials = ["HS-7500-2026-X", "CR-12000-A99", "DK-VRV-98765"];
+            const randomSN = mockSerials[Math.floor(Math.random() * mockSerials.length)];
+            document.getElementById('eq-sn').value = randomSN;
+        }
 
-            // Populate PDF printable container template
-            document.getElementById('pdf-doc-date').innerText = `DATA: ${new Date().toLocaleDateString('pt-BR')}`;
-            document.getElementById('pdf-client-name').innerText = activeEquipment.client || 'FRL Cliente';
-            document.getElementById('pdf-client-resp').innerText = 'Marcos Silva';
-            
-            document.getElementById('pdf-eq-tag').innerText = activeEquipment.id;
-            document.getElementById('pdf-eq-name').innerText = `${activeEquipment.brand} ${activeEquipment.model}`;
-            document.getElementById('pdf-eq-model').innerText = activeEquipment.model;
-            document.getElementById('pdf-eq-room').innerText = activeEquipment.room;
-            document.getElementById('pdf-eq-btus').innerText = activeEquipment.btus || '7.5K BTUs';
-            document.getElementById('pdf-eq-gas').innerText = activeEquipment.gas || 'R-410A';
+        async function generatePDFReport(e) {
+            e.preventDefault();
 
-            document.getElementById('pdf-obs-text').innerText = document.getElementById('ck-general-obs').value || 'Nenhuma observação técnica adicional.';
+            // Pega dados inseridos
+            const clientName = document.getElementById('client-name').value;
+            const clientAddress = document.getElementById('client-address').value;
+            const clientPhone = document.getElementById('client-phone').value;
+            const clientResp = document.getElementById('client-resp').value;
 
-            // Populate tasks table in PDF
-            const pdfTableBody = document.getElementById('pdf-tasks-body');
-            pdfTableBody.innerHTML = '';
+            const eqTag = document.getElementById('eq-tag').value;
+            const eqType = document.getElementById('eq-type').value;
+            const eqBrand = document.getElementById('eq-brand').value;
+            const eqModel = document.getElementById('eq-model').value;
+            const eqSN = document.getElementById('eq-sn').value;
+            const eqRoom = document.getElementById('eq-room').value;
+            const eqBtus = document.getElementById('eq-btus').value || '7.500 BTUs';
+            const eqGas = document.getElementById('eq-gas').value || 'R-410A';
+            const eqArea = document.getElementById('eq-area').value || '-';
+            const eqOccupants = document.getElementById('eq-occupants').value || '-';
 
-            PDF_CHECKLIST_TASKS.forEach((taskName, idx) => {
-                const taskData = activeChecklistState[idx] || {};
-                const statusStr = taskData.checked ? '<span style="color:green;font-weight:bold;">OK</span>' : '<span style="color:red;font-weight:bold;">PENDENTE</span>';
-                
+            const generalObs = document.getElementById('general-obs').value || 'Nenhuma observação técnica adicional.';
+
+            // Preenche o template PDF
+            document.getElementById('pdf-date-str').innerText = `DATA: ${new Date().toLocaleDateString('pt-BR')}`;
+            document.getElementById('pdf-out-client').innerText = clientName;
+            document.getElementById('pdf-out-address').innerText = clientAddress;
+            document.getElementById('pdf-out-phone').innerText = clientPhone;
+            document.getElementById('pdf-out-resp').innerText = clientResp;
+
+            document.getElementById('pdf-out-tag').innerText = eqTag;
+            document.getElementById('pdf-out-type').innerText = eqType;
+            document.getElementById('pdf-out-model').innerText = `${eqBrand} - ${eqModel}`;
+            document.getElementById('pdf-out-sn').innerText = eqSN;
+            document.getElementById('pdf-out-room').innerText = eqRoom;
+            document.getElementById('pdf-out-btus').innerText = eqBtus;
+            document.getElementById('pdf-out-gas').innerText = eqGas;
+            document.getElementById('pdf-out-area').innerText = eqArea;
+            document.getElementById('pdf-out-occupants').innerText = eqOccupants;
+
+            document.getElementById('pdf-out-general-obs').innerText = generalObs;
+
+            // Preenche tabela de tarefas
+            const pdfTasksBody = document.getElementById('pdf-out-tasks-body');
+            pdfTasksBody.innerHTML = '';
+
+            PDF_CHECKLIST_TASKS.forEach((title, idx) => {
+                const data = taskState[idx] || {};
+                let statusColor = "color: green;";
+                if (data.status === 'PENDENTE') statusColor = "color: red;";
+                if (data.status === 'N/A') statusColor = "color: gray;";
+
                 let details = [];
-                if (taskData.obs) details.push(`Obs: ${taskData.obs}`);
-                if (taskData.budget) details.push(`Orçamento: R$ ${taskData.budget}`);
-                if (taskData.photo) details.push(`[Foto Anexada]`);
+                if (data.obs) details.push(`Obs: ${data.obs}`);
+                if (data.budget) details.push(`Orçamento: R$ ${data.budget}`);
+                if (data.photo) details.push(`[Foto Anexada]`);
 
                 const row = document.createElement('tr');
                 row.className = "border-b border-slate-300";
                 row.innerHTML = `
-                    <td class="p-1 border-r border-slate-300 font-medium">${taskName}</td>
-                    <td class="p-1 border-r border-slate-300 text-center">${statusStr}</td>
+                    <td class="p-1 border-r border-slate-300 font-medium">${title}</td>
+                    <td class="p-1 border-r border-slate-300 text-center font-bold" style="${statusColor}">${data.status}</td>
                     <td class="p-1">${details.join(' | ') || '-'}</td>
                 `;
-                pdfTableBody.appendChild(row);
+                pdfTasksBody.appendChild(row);
             });
 
-            // Embed signatures into PDF
-            const techCanvas = document.getElementById('tech-sig-canvas');
-            const clientCanvas = document.getElementById('client-sig-canvas');
-            document.getElementById('pdf-tech-sig-img').innerHTML = `<img src="${techCanvas.toDataURL()}" class="h-10 object-contain">`;
-            document.getElementById('pdf-client-sig-img').innerHTML = `<img src="${clientCanvas.toDataURL()}" class="h-10 object-contain">`;
+            // Foto da Etiqueta no PDF
+            const photoContainer = document.getElementById('pdf-out-photo-container');
+            const photoDiv = document.getElementById('pdf-out-photo-img');
+            if (labelPhotoBase64) {
+                photoDiv.innerHTML = `<img src="${labelPhotoBase64}" class="max-h-28 object-contain">`;
+                photoContainer.classList.remove('hidden');
+            } else {
+                photoContainer.classList.add('hidden');
+            }
 
-            // Export to PDF using jsPDF and html2canvas
-            const target = document.getElementById('pdf-export-template');
-            
+            // Gerar PDF via html2canvas & jsPDF
             try {
+                const target = document.getElementById('pdf-export-template');
                 const canvas = await html2canvas(target, { scale: 2 });
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgProps = pdf.getImageProperties(imgData);
                 const pdfWidth = pdf.internal.pageSize.getWidth();
+                const imgProps = pdf.getImageProperties(imgData);
                 const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`Checklist_${activeEquipment.id}_${new Date().toISOString().slice(0,10)}.pdf`);
+                pdf.save(`Checklist_${eqTag}_${new Date().toISOString().slice(0,10)}.pdf`);
 
-                // Save to history
-                addReportToHistory(activeEquipment);
-                alert('Manutenção finalizada e PDF gerado com sucesso!');
-                switchView('history');
             } catch (err) {
-                console.error(err);
-                alert('Erro ao gerar o PDF. Verifique os dados inseridos.');
+                console.error('Erro ao gerar PDF:', err);
+                alert('Erro ao gerar relatório em PDF. Tente novamente.');
             }
-        }
-
-        function addReportToHistory(eq) {
-            const historyList = document.getElementById('history-reports-list');
-            const card = document.createElement('div');
-            card.className = "bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between";
-            card.innerHTML = `
-                <div>
-                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Concluído</span>
-                    <h4 class="font-bold text-navy-900 text-sm mt-1">${eq.brand} ${eq.model} (${eq.id})</h4>
-                    <p class="text-xs text-slate-500">${eq.client} • ${new Date().toLocaleDateString('pt-BR')}</p>
-                </div>
-                <button onclick="alert('PDF baixado do histórico.')" class="bg-navy-900 text-white p-2.5 rounded-xl font-bold text-xs flex items-center gap-1">
-                    <i class="fa-solid fa-file-pdf text-amber-400"></i> PDF
-                </button>
-            `;
-            historyList.prepend(card);
         }
     </script>
 </body>
