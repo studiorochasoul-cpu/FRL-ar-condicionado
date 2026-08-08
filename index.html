@@ -62,27 +62,46 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <div id="pwa-install-banner" class="bg-navy-900 text-white px-4 py-3 shadow-md border-b border-sky-500/30 flex items-center justify-between sticky top-0 z-50 text-sm">
+    <!-- Topo Fixo com Logo e Nome da Empresa (FRL Serviços) -->
+    <header class="bg-navy-900 text-white border-b border-sky-500/20 sticky top-0 z-50 px-4 py-3 shadow-lg">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-400/40 text-sky-400 flex items-center justify-center font-bold text-xl shadow-inner">
+                    <i class="fa-solid fa-snowflake"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-white leading-none text-base sm:text-lg tracking-tight">FRL serviços</h1>
+                    <span class="text-[10px] sm:text-[11px] text-sky-300 font-medium">Checklist e Manutenção HVAC</span>
+                </div>
+            </div>
+            <button id="header-install-btn" onclick="handleInstallClick()" class="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-md transition flex items-center gap-1.5">
+                <i class="fa-solid fa-download"></i> Instalar App
+            </button>
+        </div>
+    </header>
+
+    <!-- Banner PWA secundário (caso o evento de instalação do Chrome esteja pronto) -->
+    <div id="pwa-install-banner" class="bg-navy-800 text-white px-4 py-2.5 shadow-md border-b border-sky-500/30 flex items-center justify-between sticky top-[61px] z-40 text-sm">
         <div class="flex items-center space-x-3">
-            <div class="bg-sky-500/20 p-2 rounded-xl text-sky-400 flex items-center justify-center">
-                <i class="fa-solid fa-mobile-screen-button text-lg"></i>
+            <div class="bg-sky-500/20 p-1.5 rounded-xl text-sky-400 flex items-center justify-center">
+                <i class="fa-solid fa-mobile-screen-button text-base"></i>
             </div>
             <div>
-                <p class="font-bold leading-tight text-xs sm:text-sm">Instalar FRL serviços</p>
-                <p class="text-[11px] text-slate-300">Toque para adicionar à sua tela inicial</p>
+                <p class="font-bold leading-tight text-xs">Instalar FRL serviços na tela inicial</p>
+                <p class="text-[10px] text-slate-300">Acesse o app offline como um aplicativo nativo</p>
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <button id="install-button" onclick="handleInstallClick()" class="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow transition flex items-center gap-1.5">
+            <button id="install-button" onclick="handleInstallClick()" class="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow transition flex items-center gap-1">
                 <i class="fa-solid fa-download text-xs"></i> Instalar
             </button>
             <button onclick="dismissPwaBanner()" class="text-slate-400 hover:text-white p-1">
-                <i class="fa-solid fa-xmark text-lg"></i>
+                <i class="fa-solid fa-xmark text-base"></i>
             </button>
         </div>
     </div>
 
-    <!-- Modal de instruções para navegadores sem prompt automático -->
+    <!-- Modal de instruções para dispositivos onde o prompt direto do navegador é restrito pelo SO (ex: iPhone Safari) -->
     <div id="install-instructions-modal" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl border border-slate-200">
             <div class="flex justify-between items-center border-b pb-3 border-slate-100">
@@ -95,14 +114,14 @@
             </div>
 
             <div class="space-y-3 text-xs text-slate-600">
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                <div class="bg-sky-50 p-3 rounded-2xl border border-sky-100">
                     <p class="font-bold text-navy-900 mb-1 flex items-center gap-1.5">
                         <i class="fa-brands fa-android text-emerald-600 text-sm"></i> No Android (Chrome):
                     </p>
                     <ol class="list-decimal list-inside space-y-1 text-[11px]">
-                        <li>Toque no menu <strong>(⋮) 3 pontinhos</strong> no canto superior direito.</li>
-                        <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à Tela inicial"</strong>.</li>
-                        <li>Confirme a instalação para ter o ícone do app.</li>
+                        <li>Abra este site pelo <strong>Google Chrome</strong> via HTTPS.</li>
+                        <li>Toque no menu <strong>(⋮) 3 pontinhos</strong> do canto superior direito.</li>
+                        <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
                     </ol>
                 </div>
 
@@ -111,7 +130,7 @@
                         <i class="fa-brands fa-apple text-slate-800 text-sm"></i> No iPhone (Safari):
                     </p>
                     <ol class="list-decimal list-inside space-y-1 text-[11px]">
-                        <li>Toque no ícone <strong>Compartilhar <i class="fa-solid fa-arrow-up-from-bracket"></i></strong> na barra inferior.</li>
+                        <li>Toque no ícone <strong>Compartilhar <i class="fa-solid fa-arrow-up-from-bracket"></i></strong>.</li>
                         <li>Escolha <strong>"Adicionar à Tela de Início"</strong>.</li>
                     </ol>
                 </div>
@@ -122,20 +141,6 @@
             </button>
         </div>
     </div>
-
-    <header class="bg-white border-b border-slate-200 sticky top-11 z-40 px-4 py-3 shadow-sm">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-2xl bg-navy-900 text-white flex items-center justify-center font-bold text-lg shadow-md border border-sky-400/20">
-                    <i class="fa-solid fa-snowflake text-sky-400"></i>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-navy-900 leading-none text-base tracking-tight">FRL serviços</h1>
-                    <span class="text-[11px] text-slate-500 font-medium">Checklist e Manutenção Preventiva HVAC</span>
-                </div>
-            </div>
-        </div>
-    </header>
 
     <main class="flex-grow max-w-md w-full mx-auto p-4 pb-12 overflow-y-auto space-y-6">
 
@@ -375,40 +380,123 @@
     </div>
 
     <script>
-        // Registra Service Worker se disponível
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW ativo no escopo:', reg.scope))
-                    .catch(err => console.log('Aviso SW:', err));
-            });
+        
+        // Gerador dinâmico de ícones PNG para atender 100% dos requisitos do PWA no Android/Chrome
+        function createPwaIconPng(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Fundo Azul Marinho
+            ctx.fillStyle = '#002B49';
+            ctx.fillRect(0, 0, size, size);
+
+            // Borda Ciano
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = size * 0.04;
+            ctx.strokeRect(size * 0.05, size * 0.05, size * 0.9, size * 0.9);
+
+            // Ícone Floco de Neve
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = `bold ${Math.round(size * 0.5)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('❄', size / 2, size / 2);
+
+            return canvas.toDataURL('image/png');
         }
 
-        // PWA Prompt Event logic
+        // Registra Manifest e SW dinamicamente com suporte a ícones PNG reais de 192px e 512px
+        (function setupPwaEnvironment() {
+            try {
+                const icon192 = createPwaIconPng(192);
+                const icon512 = createPwaIconPng(512);
+
+                const manifestData = {
+                    name: "FRL serviços",
+                    short_name: "FRL serviços",
+                    description: "Checklist e Manutenção HVAC - FRL serviços",
+                    start_url: window.location.href,
+                    display: "standalone",
+                    background_color: "#001E35",
+                    theme_color: "#002B49",
+                    icons: [
+                        { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                        { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                    ]
+                };
+
+                const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+                const manifestUrl = URL.createObjectURL(manifestBlob);
+
+                let manifestTag = document.querySelector('link[rel="manifest"]');
+                if (!manifestTag) {
+                    manifestTag = document.createElement('link');
+                    manifestTag.rel = 'manifest';
+                    document.head.appendChild(manifestTag);
+                }
+                manifestTag.href = manifestUrl;
+
+                // Registra Service Worker inline
+                if ('serviceWorker' in navigator) {
+                    const swCode = `
+                        const CACHE_NAME = 'frl-pwa-v3';
+                        self.addEventListener('install', e => { self.skipWaiting(); });
+                        self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+                        self.addEventListener('fetch', e => {
+                            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                        });
+                    `;
+                    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(swBlob);
+
+                    navigator.serviceWorker.register(swUrl)
+                        .then(reg => console.log('SW PWA Ativo:', reg.scope))
+                        .catch(err => console.log('Aviso SW:', err));
+                }
+            } catch (err) {
+                console.error("Erro ao configurar PWA:", err);
+            }
+        })();
+
+        // Evento Nativo de Instalação PWA
         let deferredPwaPrompt = null;
+
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Previne o aviso padrão imediato para podermos controlar via botão
             e.preventDefault();
             deferredPwaPrompt = e;
+
+            // Exibe botões de instalação destacando-os
             const banner = document.getElementById('pwa-install-banner');
             if (banner) banner.classList.remove('hidden');
+
+            const headerBtn = document.getElementById('header-install-btn');
+            if (headerBtn) {
+                headerBtn.classList.add('animate-pulse');
+            }
         });
 
-        function handleInstallClick() {
+        async function handleInstallClick() {
             if (deferredPwaPrompt) {
+                // Dispara o diálogo oficial e nativo de instalação do Android / Chrome
                 deferredPwaPrompt.prompt();
-                deferredPwaPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        dismissPwaBanner();
-                    }
-                    deferredPwaPrompt = null;
-                });
+                const choiceResult = await deferredPwaPrompt.userChoice;
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuário aceitou a instalação do FRL serviços');
+                    dismissPwaBanner();
+                }
+                deferredPwaPrompt = null;
             } else {
+                // Se o evento nativo ainda não disparou ou estiver rodando em iOS/outro browser, abre o instrucional
                 openInstallModal();
             }
         }
 
         function dismissPwaBanner() {
-            document.getElementById('pwa-install-banner').classList.add('hidden');
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.add('hidden');
         }
 
         function openInstallModal() {
@@ -419,7 +507,7 @@
             document.getElementById('install-instructions-modal').classList.add('hidden');
         }
 
-        // 11 Itens de inspeção oficiais extraídos do documento PDF FRL Serviços
+        // 11 Itens de inspeção do PDF FRL Serviços
         const PDF_CHECKLIST_TASKS = [
             "Verificar se todas as funções estão operando",
             "Limpar o filtro de ar",
