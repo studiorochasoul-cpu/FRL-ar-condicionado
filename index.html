@@ -212,7 +212,7 @@
 
             <!-- BOTÃO GERAR RELATÓRIO PDF -->
             <div class="pt-2">
-                <button type="submit" class="w-full py-4 bg-navy-900 hover:bg-navy-800 active:bg-slate-900 text-white font-bold text-base rounded-2xl shadow-xl flex items-center justify-center space-x-2 transition-all duration-200 transform active:scale-[0.99]">
+                <button type="submit" id="btnGeneratePdf" class="w-full py-4 bg-navy-900 hover:bg-navy-800 active:bg-slate-900 text-white font-bold text-base rounded-2xl shadow-xl flex items-center justify-center space-x-2 transition-all duration-200 transform active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed">
                     <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     <span>GERAR RELATÓRIO PDF FRL SERVIÇOS</span>
                 </button>
@@ -283,7 +283,7 @@
         const itemPhotos = {};
         let tagPhotoBase64 = null;
 
-        // Função para formatar automaticamente input para moeda Real (R$)
+        // Formatar input para moeda Real (R$)
         function formatCurrencyInput(input) {
             let value = input.value.replace(/\D/g, '');
             if (!value) {
@@ -454,190 +454,228 @@
             document.getElementById('installModal').classList.add('hidden');
         }
 
-        // GERAÇÃO DO RELATÓRIO PDF IDÊNTICO AO DOCUMENTO OFICIAL FRL SERVIÇOS
-        function generatePDF() {
-            const cliente = document.getElementById('cliente').value || '-';
-            const telefone = document.getElementById('telefone').value || '-';
-            const endereco = document.getElementById('endereco').value || '-';
-            const responsavel = document.getElementById('responsavel').value || '-';
-
-            const tag = document.getElementById('tag').value || '-';
-            const equipamento = document.getElementById('equipamento').value || '-';
-            const modelo = document.getElementById('modelo').value || '-';
-            const numeroSerie = document.getElementById('numeroSerie').value || '-';
-            const numeroSala = document.getElementById('numeroSala').value || '-';
-            const btus = document.getElementById('btus').value || '-';
-            const gasRefrigerante = document.getElementById('gasRefrigerante').value || '-';
-            const areaClimatizada = document.getElementById('areaClimatizada').value || '-';
-            const ocupantes = document.getElementById('ocupantes').value || '-';
-
-            const dataManutencao = document.getElementById('dataManutencao').value ? 
-                new Date(document.getElementById('dataManutencao').value).toLocaleDateString('pt-BR') : '-';
-            const observacoesGerais = document.getElementById('observacoesGerais').value || 'Sem observações gerais.';
-
-            // Constrói as linhas da tabela de checklist no PDF
-            let checklistRowsHtml = '';
-            checklistTasks.forEach((task, idx) => {
-                const statusEl = document.querySelector(`input[name="status_${idx}"]:checked`);
-                const status = statusEl ? statusEl.value : 'Pendente';
-                const obs = document.getElementById(`obs_${idx}`).value;
-                const rawOrcamento = document.getElementById(`orcamento_${idx}`).value.trim();
-                const photoBase64 = itemPhotos[idx];
-
-                let statusBadgeColor = '#64748b';
-                if (status === 'OK') statusBadgeColor = '#15803d';
-                if (status === 'NÃO OK') statusBadgeColor = '#b91c1c';
-
-                // Formatação do orçamento no PDF
-                let orcamentoFormatted = '';
-                if (rawOrcamento) {
-                    if (rawOrcamento.includes('R$')) {
-                        orcamentoFormatted = rawOrcamento;
-                    } else {
-                        let numeric = rawOrcamento.replace(/\D/g, '');
-                        if (numeric) {
-                            let val = (parseInt(numeric, 10) / 100).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-                            orcamentoFormatted = 'R$ ' + val;
-                        } else {
-                            orcamentoFormatted = rawOrcamento;
-                        }
-                    }
-                }
-
-                let photoHtml = '';
-                if (photoBase64) {
-                    photoHtml = `<div style="margin-top: 4px;"><img src="${photoBase64}" style="max-height: 48px; max-width: 90px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; display: inline-block;" /></div>`;
-                }
-
-                checklistRowsHtml += `
-                    <tr style="border-bottom: 1px solid #e2e8f0; ${idx % 2 === 0 ? 'background-color: #f8fafc;' : ''}">
-                        <td style="padding: 6px 8px; font-weight: bold; width: 22px; text-align: center; color: #002B49;">${idx + 1}</td>
-                        <td style="padding: 6px 8px; font-size: 10px; color: #1e293b; line-height: 1.3;">${task}</td>
-                        <td style="padding: 6px 8px; font-weight: bold; font-size: 10px; text-align: center; width: 65px; color: ${statusBadgeColor};">
-                            ${status}
-                        </td>
-                        <td style="padding: 6px 8px; font-size: 9px; color: #334155;">
-                            ${obs ? `<div><strong>Obs:</strong> ${obs}</div>` : ''}
-                            ${orcamentoFormatted ? `<div><strong>Orçamento:</strong> ${orcamentoFormatted}</div>` : ''}
-                            ${photoHtml}
-                        </td>
-                    </tr>
-                `;
-            });
-
-            // Elemento HTML do Relatório PDF (Injetado Temporariamente)
-            const pdfContainer = document.createElement('div');
-            pdfContainer.style.width = '100%';
-            pdfContainer.style.padding = '20px';
-            pdfContainer.style.backgroundColor = '#ffffff';
-            pdfContainer.style.fontFamily = 'Arial, sans-serif';
-            pdfContainer.style.fontSize = '11px';
-            pdfContainer.style.color = '#1e293b';
-
-            pdfContainer.innerHTML = `
-                <!-- CABEÇALHO OFICIAL FRL SERVIÇOS -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #002B49; pb: 10px; margin-bottom: 12px;">
-                    <div>
-                        <h1 style="font-size: 20px; font-weight: bold; color: #002B49; margin: 0;">FRL SERVIÇOS</h1>
-                        <p style="font-size: 9px; color: #475569; margin: 2px 0 0 0;">CNPJ: 58.475.400/0001-33</p>
-                        <p style="font-size: 9px; color: #475569; margin: 0;">EST. Antônio Guimarães Mosqueira Nº1301 - Parque Atlântico, Macaé-RJ</p>
-                        <p style="font-size: 9px; color: #475569; margin: 0;">TEL: (22) 99961-5971 | E-mail: admfrservicos@gmail.com</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <span style="font-size: 11px; font-weight: bold; background-color: #002B49; color: #ffffff; padding: 4px 8px; border-radius: 4px;">RELATÓRIO TÉCNICO</span>
-                        <p style="font-size: 9px; color: #64748b; margin-top: 6px;">DATA: ${dataManutencao}</p>
-                    </div>
-                </div>
-
-                <!-- DADOS DO EMPREENDIMENTO -->
-                <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid #002B49;">
-                    <h2 style="font-size: 11px; font-weight: bold; color: #002B49; margin: 0 0 6px 0; text-transform: uppercase;">DADOS DO EMPREENDIMENTO / CLIENTE</h2>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
-                        <tr>
-                            <td style="width: 50%; padding: 2px 0;"><strong>CLIENTE:</strong> ${cliente}</td>
-                            <td style="width: 50%; padding: 2px 0;"><strong>TEL:</strong> ${telefone}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 2px 0;"><strong>ENDEREÇO:</strong> ${endereco}</td>
-                            <td style="padding: 2px 0;"><strong>RESPONSÁVEL:</strong> ${responsavel}</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <!-- DADOS DO EQUIPAMENTO -->
-                <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid #0284c7;">
-                    <h2 style="font-size: 11px; font-weight: bold; color: #0284c7; margin: 0 0 6px 0; text-transform: uppercase;">DADOS DO EQUIPAMENTO</h2>
-                    <div style="display: flex; gap: 10px; justify-content: space-between;">
-                        <table style="width: ${tagPhotoBase64 ? '70%' : '100%'}; border-collapse: collapse; font-size: 10px;">
-                            <tr>
-                                <td style="padding: 2px 0;"><strong>TAG:</strong> ${tag}</td>
-                                <td style="padding: 2px 0;"><strong>EQUIPAMENTO:</strong> ${equipamento}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 2px 0;"><strong>MODELO:</strong> ${modelo}</td>
-                                <td style="padding: 2px 0;"><strong>Nº DE SÉRIE:</strong> ${numeroSerie}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 2px 0;"><strong>Nº DA SALA:</strong> ${numeroSala}</td>
-                                <td style="padding: 2px 0;"><strong>BTUS:</strong> ${btus}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 2px 0;"><strong>GÁS REFRIGERANTE:</strong> ${gasRefrigerante}</td>
-                                <td style="padding: 2px 0;"><strong>ÁREA CLIMATIZADA:</strong> ${areaClimatizada}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" style="padding: 2px 0;"><strong>OCUPANTES:</strong> ${ocupantes}</td>
-                            </tr>
-                        </table>
-
-                        ${tagPhotoBase64 ? `
-                            <div style="width: 28%; text-align: right;">
-                                <span style="font-size: 8px; color: #64748b; display: block; margin-bottom: 2px;">Etiqueta do Ativo</span>
-                                <img src="${tagPhotoBase64}" style="max-height: 65px; max-width: 100%; object-fit: contain; border-radius: 4px; border: 1px solid #cbd5e1;" />
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-
-                <!-- TABELA CHECKLIST DE MANUTENÇÃO -->
-                <h2 style="font-size: 11px; font-weight: bold; color: #002B49; margin: 0 0 6px 0; text-transform: uppercase;">SERVIÇOS EXECUTADOS / CHECKLIST</h2>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
-                    <thead>
-                        <tr style="background-color: #002B49; color: #ffffff; font-size: 9px; text-align: left;">
-                            <th style="padding: 6px; text-align: center;">#</th>
-                            <th style="padding: 6px;">ITEM / ATIVIDADE</th>
-                            <th style="padding: 6px; text-align: center;">STATUS</th>
-                            <th style="padding: 6px;">OBSERVAÇÃO / FOTO</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${checklistRowsHtml}
-                    </tbody>
-                </table>
-
-                <!-- OBSERVAÇÕES GERAIS -->
-                <div style="border: 1px solid #cbd5e1; padding: 8px; border-radius: 4px; background-color: #ffffff; margin-bottom: 12px;">
-                    <strong style="font-size: 10px; color: #002B49;">OBSERVAÇÕES TÉCNICAS GERAIS:</strong>
-                    <p style="font-size: 9.5px; color: #334155; margin: 4px 0 0 0; white-space: pre-line;">${observacoesGerais}</p>
-                </div>
-
-                <!-- RODAPÉ DO PDF -->
-                <div style="text-align: center; border-top: 1px solid #e2e8f0; pt: 8px; margin-top: 20px; font-size: 8px; color: #94a3b8;">
-                    FRL Serviços — Documento gerado via App FRL Serviços
-                </div>
+        // GERAÇÃO DO RELATÓRIO PDF FRL SERVIÇOS
+        async function generatePDF() {
+            const btn = document.getElementById('btnGeneratePdf');
+            const originalBtnHtml = btn.innerHTML;
+            
+            // Ativa estado de carregamento no botão
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-sky-400 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>GERANDO RELATÓRIO PDF, AGUARDE...</span>
             `;
 
-            // Opções do html2pdf
-            const opt = {
-                margin:       8,
-                filename:     `Checklist_FRL_${tag.replace(/[^a-zA-Z0-9]/g, '_')}_${dataManutencao.replace(/\//g, '-')}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            try {
+                const cliente = document.getElementById('cliente').value || '-';
+                const telefone = document.getElementById('telefone').value || '-';
+                const endereco = document.getElementById('endereco').value || '-';
+                const responsavel = document.getElementById('responsavel').value || '-';
 
-            // Processa o PDF
-            html2pdf().set(opt).from(pdfContainer).save();
+                const tag = document.getElementById('tag').value || '-';
+                const equipamento = document.getElementById('equipamento').value || '-';
+                const modelo = document.getElementById('modelo').value || '-';
+                const numeroSerie = document.getElementById('numeroSerie').value || '-';
+                const numeroSala = document.getElementById('numeroSala').value || '-';
+                const btus = document.getElementById('btus').value || '-';
+                const gasRefrigerante = document.getElementById('gasRefrigerante').value || '-';
+                const areaClimatizada = document.getElementById('areaClimatizada').value || '-';
+                const ocupantes = document.getElementById('ocupantes').value || '-';
+
+                const dataManutencaoRaw = document.getElementById('dataManutencao').value;
+                const dataManutencao = dataManutencaoRaw ? 
+                    new Date(dataManutencaoRaw + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
+                const observacoesGerais = document.getElementById('observacoesGerais').value || 'Sem observações gerais.';
+
+                // Linhas da Tabela do Checklist
+                let checklistRowsHtml = '';
+                checklistTasks.forEach((task, idx) => {
+                    const statusEl = document.querySelector(`input[name="status_${idx}"]:checked`);
+                    const status = statusEl ? statusEl.value : 'Pendente';
+                    const obs = document.getElementById(`obs_${idx}`).value.trim();
+                    const rawOrcamento = document.getElementById(`orcamento_${idx}`).value.trim();
+                    const photoBase64 = itemPhotos[idx];
+
+                    let statusColor = '#64748b';
+                    if (status === 'OK') statusColor = '#15803d';
+                    if (status === 'NÃO OK') statusColor = '#b91c1c';
+
+                    let orcamentoFormatted = '';
+                    if (rawOrcamento) {
+                        if (rawOrcamento.includes('R$')) {
+                            orcamentoFormatted = rawOrcamento;
+                        } else {
+                            let numeric = rawOrcamento.replace(/\D/g, '');
+                            if (numeric) {
+                                let val = (parseInt(numeric, 10) / 100).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+                                orcamentoFormatted = 'R$ ' + val;
+                            } else {
+                                orcamentoFormatted = rawOrcamento;
+                            }
+                        }
+                    }
+
+                    let photoHtml = '';
+                    if (photoBase64) {
+                        photoHtml = `<div style="margin-top: 4px;"><img src="${photoBase64}" style="max-height: 55px; max-width: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; display: block;" /></div>`;
+                    }
+
+                    checklistRowsHtml += `
+                        <tr style="border-bottom: 1px solid #e2e8f0; ${idx % 2 === 0 ? 'background-color: #f8fafc;' : 'background-color: #ffffff;'}">
+                            <td style="padding: 6px 8px; font-weight: bold; width: 24px; text-align: center; color: #002B49; vertical-align: top;">${idx + 1}</td>
+                            <td style="padding: 6px 8px; font-size: 10px; color: #1e293b; line-height: 1.3; vertical-align: top;">${task}</td>
+                            <td style="padding: 6px 8px; font-weight: bold; font-size: 10px; text-align: center; width: 70px; color: ${statusColor}; vertical-align: top;">
+                                ${status}
+                            </td>
+                            <td style="padding: 6px 8px; font-size: 9px; color: #334155; vertical-align: top;">
+                                ${obs ? `<div style="margin-bottom: 2px;"><strong>Obs:</strong> ${obs}</div>` : ''}
+                                ${orcamentoFormatted ? `<div style="margin-bottom: 2px;"><strong>Orçamento:</strong> ${orcamentoFormatted}</div>` : ''}
+                                ${photoHtml}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                // Criar container de renderização do PDF e anexa-lo temporariamente ao DOM (SOLUÇÃO DO PDF EM BRANCO)
+                const pdfContainer = document.createElement('div');
+                pdfContainer.id = 'pdfRenderContainer';
+                pdfContainer.style.position = 'absolute';
+                pdfContainer.style.left = '-9999px';
+                pdfContainer.style.top = '0';
+                pdfContainer.style.width = '750px';
+                pdfContainer.style.backgroundColor = '#ffffff';
+                pdfContainer.style.fontFamily = 'Arial, sans-serif';
+                pdfContainer.style.fontSize = '11px';
+                pdfContainer.style.color = '#1e293b';
+                pdfContainer.style.padding = '20px';
+                pdfContainer.style.boxSizing = 'border-box';
+
+                pdfContainer.innerHTML = `
+                    <!-- CABEÇALHO OFICIAL FRL SERVIÇOS -->
+                    <table style="width: 100%; border-bottom: 2px solid #002B49; padding-bottom: 8px; margin-bottom: 12px; border-collapse: collapse;">
+                        <tr>
+                            <td style="vertical-align: top;">
+                                <h1 style="font-size: 20px; font-weight: bold; color: #002B49; margin: 0; line-height: 1;">FRL SERVIÇOS</h1>
+                                <p style="font-size: 9px; color: #475569; margin: 3px 0 0 0;">CNPJ: 58.475.400/0001-33</p>
+                                <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">EST. Antônio Guimarães Mosqueira Nº1301 - Parque Atlântico, Macaé-RJ</p>
+                                <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">TEL: (22) 99961-5971 | E-mail: admfrservicos@gmail.com</p>
+                            </td>
+                            <td style="vertical-align: top; text-align: right; width: 180px;">
+                                <span style="font-size: 10px; font-weight: bold; background-color: #002B49; color: #ffffff; padding: 4px 8px; border-radius: 4px; display: inline-block;">RELATÓRIO TÉCNICO</span>
+                                <p style="font-size: 9px; color: #64748b; margin: 6px 0 0 0;">DATA: ${dataManutencao}</p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- DADOS DO EMPREENDIMENTO -->
+                    <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid #002B49;">
+                        <h2 style="font-size: 10px; font-weight: bold; color: #002B49; margin: 0 0 4px 0; text-transform: uppercase;">DADOS DO EMPREENDIMENTO / CLIENTE</h2>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
+                            <tr>
+                                <td style="width: 50%; padding: 2px 0;"><strong>CLIENTE:</strong> ${cliente}</td>
+                                <td style="width: 50%; padding: 2px 0;"><strong>TEL:</strong> ${telefone}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 2px 0;"><strong>ENDEREÇO:</strong> ${endereco}</td>
+                                <td style="padding: 2px 0;"><strong>RESPONSÁVEL:</strong> ${responsavel}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- DADOS DO EQUIPAMENTO -->
+                    <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid #0284c7;">
+                        <h2 style="font-size: 10px; font-weight: bold; color: #0284c7; margin: 0 0 4px 0; text-transform: uppercase;">DADOS DO EQUIPAMENTO</h2>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="vertical-align: top;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
+                                        <tr>
+                                            <td style="width: 50%; padding: 2px 0;"><strong>TAG:</strong> ${tag}</td>
+                                            <td style="width: 50%; padding: 2px 0;"><strong>EQUIPAMENTO:</strong> ${equipamento}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0;"><strong>MODELO:</strong> ${modelo}</td>
+                                            <td style="padding: 2px 0;"><strong>Nº DE SÉRIE:</strong> ${numeroSerie}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0;"><strong>Nº DA SALA:</strong> ${numeroSala}</td>
+                                            <td style="padding: 2px 0;"><strong>BTUS:</strong> ${btus}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0;"><strong>GÁS REFRIGERANTE:</strong> ${gasRefrigerante}</td>
+                                            <td style="padding: 2px 0;"><strong>ÁREA CLIMATIZADA:</strong> ${areaClimatizada}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" style="padding: 2px 0;"><strong>OCUPANTES:</strong> ${ocupantes}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                ${tagPhotoBase64 ? `
+                                    <td style="width: 120px; vertical-align: top; text-align: right; padding-left: 10px;">
+                                        <span style="font-size: 8px; color: #64748b; display: block; margin-bottom: 2px;">Etiqueta</span>
+                                        <img src="${tagPhotoBase64}" style="max-height: 60px; max-width: 110px; object-fit: contain; border-radius: 4px; border: 1px solid #cbd5e1; display: inline-block;" />
+                                    </td>
+                                ` : ''}
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- TABELA CHECKLIST DE MANUTENÇÃO -->
+                    <h2 style="font-size: 10px; font-weight: bold; color: #002B49; margin: 0 0 6px 0; text-transform: uppercase;">SERVIÇOS EXECUTADOS / CHECKLIST</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                        <thead>
+                            <tr style="background-color: #002B49; color: #ffffff; font-size: 9px; text-align: left;">
+                                <th style="padding: 5px; text-align: center; width: 24px;">#</th>
+                                <th style="padding: 5px;">ITEM / ATIVIDADE</th>
+                                <th style="padding: 5px; text-align: center; width: 70px;">STATUS</th>
+                                <th style="padding: 5px;">OBSERVAÇÃO / FOTO / ORÇAMENTO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${checklistRowsHtml}
+                        </tbody>
+                    </table>
+
+                    <!-- OBSERVAÇÕES GERAIS -->
+                    <div style="border: 1px solid #cbd5e1; padding: 8px; border-radius: 4px; background-color: #ffffff; margin-bottom: 12px;">
+                        <strong style="font-size: 9.5px; color: #002B49;">OBSERVAÇÕES TÉCNICAS GERAIS:</strong>
+                        <p style="font-size: 9px; color: #334155; margin: 3px 0 0 0; white-space: pre-line;">${observacoesGerais}</p>
+                    </div>
+
+                    <!-- RODAPÉ DO PDF -->
+                    <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 8px; color: #94a3b8;">
+                        FRL Serviços — Relatório Técnico de Manutenção Preventiva HVAC
+                    </div>
+                `;
+
+                // Anexar elemento ao corpo do documento para possibilitar renderização do canvas
+                document.body.appendChild(pdfContainer);
+
+                // Aguardar renderização interna de imagens no DOM
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                const opt = {
+                    margin:       [8, 8, 8, 8],
+                    filename:     `Checklist_FRL_${tag.replace(/[^a-zA-Z0-9]/g, '_')}_${dataManutencao.replace(/\//g, '-')}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, logging: false },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                await html2pdf().set(opt).from(pdfContainer).save();
+
+                // Remover container temporário
+                document.body.removeChild(pdfContainer);
+            } catch (err) {
+                console.error('Erro ao gerar PDF:', err);
+                alert('Erro ao gerar PDF. Por favor tente novamente.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+            }
         }
     </script>
 </body>
