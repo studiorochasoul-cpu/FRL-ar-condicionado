@@ -47,12 +47,6 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .signature-canvas {
-            border: 2px dashed #cbd5e1;
-            background-color: #ffffff;
-            touch-action: none;
-        }
-        /* Custom scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -79,8 +73,8 @@
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="handleInstallClick()" class="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow transition">
-                Instalar
+            <button id="install-button" onclick="handleInstallClick()" class="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow transition flex items-center gap-1.5">
+                <i class="fa-solid fa-download text-xs"></i> Instalar
             </button>
             <button onclick="dismissPwaBanner()" class="text-slate-400 hover:text-white p-1">
                 <i class="fa-solid fa-xmark text-lg"></i>
@@ -88,11 +82,12 @@
         </div>
     </div>
 
+    <!-- Modal de instruções para navegadores sem prompt automático -->
     <div id="install-instructions-modal" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl border border-slate-200">
             <div class="flex justify-between items-center border-b pb-3 border-slate-100">
                 <h3 class="font-bold text-navy-900 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-download text-sky-500"></i> Como instalar o App
+                    <i class="fa-solid fa-mobile-screen text-sky-500"></i> Instalar FRL serviços
                 </h3>
                 <button onclick="closeInstallModal()" class="text-slate-400 hover:text-slate-600">
                     <i class="fa-solid fa-xmark text-xl"></i>
@@ -102,12 +97,12 @@
             <div class="space-y-3 text-xs text-slate-600">
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                     <p class="font-bold text-navy-900 mb-1 flex items-center gap-1.5">
-                        <i class="fa-brands fa-android text-emerald-600 text-sm"></i> No Android (Google Chrome):
+                        <i class="fa-brands fa-android text-emerald-600 text-sm"></i> No Android (Chrome):
                     </p>
                     <ol class="list-decimal list-inside space-y-1 text-[11px]">
-                        <li>Toque nos <strong>3 pontinhos (⋮)</strong> no canto superior direito do navegador.</li>
-                        <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
-                        <li>Confirme para criar o ícone <strong>FRL serviços</strong>.</li>
+                        <li>Toque no menu <strong>(⋮) 3 pontinhos</strong> no canto superior direito.</li>
+                        <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à Tela inicial"</strong>.</li>
+                        <li>Confirme a instalação para ter o ícone do app.</li>
                     </ol>
                 </div>
 
@@ -116,9 +111,8 @@
                         <i class="fa-brands fa-apple text-slate-800 text-sm"></i> No iPhone (Safari):
                     </p>
                     <ol class="list-decimal list-inside space-y-1 text-[11px]">
-                        <li>Toque no botão <strong>Compartilhar <i class="fa-solid fa-arrow-up-from-bracket"></i></strong> na barra inferior.</li>
-                        <li>Role até a opção <strong>"Adicionar à Tela de Início"</strong>.</li>
-                        <li>Toque em <strong>Adicionar</strong>.</li>
+                        <li>Toque no ícone <strong>Compartilhar <i class="fa-solid fa-arrow-up-from-bracket"></i></strong> na barra inferior.</li>
+                        <li>Escolha <strong>"Adicionar à Tela de Início"</strong>.</li>
                     </ol>
                 </div>
             </div>
@@ -140,9 +134,6 @@
                     <span class="text-[11px] text-slate-500 font-medium">Checklist e Manutenção Preventiva HVAC</span>
                 </div>
             </div>
-            <button onclick="openInstallModal()" class="text-xs bg-slate-100 hover:bg-slate-200 font-bold text-navy-900 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
-                <i class="fa-solid fa-circle-info text-sky-600"></i> Ajuda
-            </button>
         </div>
     </header>
 
@@ -158,21 +149,21 @@
 
                 <div class="space-y-2 text-xs font-semibold">
                     <div>
-                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">CLIENTE *</label>
-                        <input type="text" id="client-name" required placeholder="Ex: Petrobras Macaé" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">CLIENTE</label>
+                        <input type="text" id="client-name" placeholder="Ex: Petrobras Macaé" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                     </div>
                     <div>
-                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">ENDEREÇO *</label>
-                        <input type="text" id="client-address" required placeholder="Ex: Av. Elias Agostinho, 100 - Macaé" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">ENDEREÇO</label>
+                        <input type="text" id="client-address" placeholder="Ex: Av. Elias Agostinho, 100 - Macaé" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TELEFONE *</label>
-                            <input type="text" id="client-phone" required placeholder="(22) 99999-9999" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TELEFONE</label>
+                            <input type="text" id="client-phone" placeholder="(22) 99999-9999" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">RESPONSÁVEL *</label>
-                            <input type="text" id="client-resp" required placeholder="Ex: Marcos Silva" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">RESPONSÁVEL</label>
+                            <input type="text" id="client-resp" placeholder="Ex: Marcos Silva" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                     </div>
                 </div>
@@ -187,19 +178,19 @@
                 <div class="space-y-2 text-xs font-semibold">
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TAG / IDENTIFICAÇÃO *</label>
-                            <input type="text" id="eq-tag" required placeholder="Ex: ACJ-7.5K-01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TAG / IDENTIFICAÇÃO</label>
+                            <input type="text" id="eq-tag" placeholder="Ex: ACJ-7.5K-01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">EQUIPAMENTO *</label>
-                            <input type="text" id="eq-type" required placeholder="Ex: Ar Condicionado ACJ" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">EQUIPAMENTO</label>
+                            <input type="text" id="eq-type" placeholder="Ex: Ar Condicionado ACJ" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">MARCA *</label>
-                            <select id="eq-brand" required class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">MARCA</label>
+                            <select id="eq-brand" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                                 <option value="">Selecione a marca</option>
                                 <option value="Hisense">Hisense</option>
                                 <option value="Carrier">Carrier</option>
@@ -212,16 +203,15 @@
                             </select>
                         </div>
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">MODELO *</label>
-                            <input type="text" id="eq-model" required placeholder="Ex: HIS-7500-A" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">MODELO</label>
+                            <input type="text" id="eq-model" placeholder="Ex: HIS-7500-A" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                     </div>
 
-                    <!-- Número de Série + Botão Scan simulado -->
                     <div>
-                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">NÚMERO DE SÉRIE *</label>
+                        <label class="text-slate-500 uppercase tracking-wider text-[10px]">NÚMERO DE SÉRIE</label>
                         <div class="relative flex items-center">
-                            <input type="text" id="eq-sn" required placeholder="Ex: S/N 998234-AX01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 pr-20 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <input type="text" id="eq-sn" placeholder="Ex: S/N 998234-AX01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 pr-20 text-slate-800 focus:ring-2 focus:ring-navy-900">
                             <button type="button" onclick="simulateSNScan()" class="absolute right-1 text-navy-900 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm">
                                 <i class="fa-solid fa-qrcode text-sky-600"></i> SCAN
                             </button>
@@ -230,19 +220,19 @@
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">Nº DA SALA / LOCAL *</label>
-                            <input type="text" id="eq-room" required placeholder="Ex: Sala 102" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">Nº DA SALA / LOCAL</label>
+                            <input type="text" id="eq-room" placeholder="Ex: Sala 102" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                         <div>
                             <label class="text-slate-500 uppercase tracking-wider text-[10px]">CAPACIDADE (BTUS)</label>
-                            <input type="text" id="eq-btus" placeholder="Ex: 7500 BTUs" value="7.500 BTUs" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <input type="text" id="eq-btus" placeholder="Ex: 7.500 BTUs" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="text-slate-500 uppercase tracking-wider text-[10px]">GÁS REFRIGERANTE</label>
-                            <input type="text" id="eq-gas" placeholder="Ex: R-410A / R-32" value="R-410A" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
+                            <input type="text" id="eq-gas" placeholder="Ex: R-410A / R-32" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
                         <div>
                             <label class="text-slate-500 uppercase tracking-wider text-[10px]">ÁREA CLIMATIZADA</label>
@@ -279,9 +269,9 @@
                     <span id="checklist-counter" class="text-[11px] font-bold text-navy-900 bg-slate-100 px-2.5 py-0.5 rounded-full">0/11 OK</span>
                 </div>
 
-                <p class="text-[11px] text-slate-500">Marque o status de cada item, adicione observações, foto ou orçamento se necessário:</p>
+                <p class="text-[11px] text-slate-500">Marque o status de cada item e adicione detalhes se necessário:</p>
 
-                <!-- Container dinâmico com todos os 11 itens do PDF -->
+                <!-- Container dinâmico dos 11 itens -->
                 <div id="checklist-items-container" class="space-y-3">
                     <!-- Populado via JS -->
                 </div>
@@ -308,6 +298,7 @@
 
     </main>
 
+    <!-- Template Oculto para exportação em PDF via html2canvas -->
     <div class="fixed top-[-9999px] left-[-9999px]">
         <div id="pdf-export-template" class="w-[800px] bg-white p-6 text-slate-900 font-sans text-xs border border-slate-300 space-y-3">
             
@@ -329,10 +320,10 @@
             <div class="border border-slate-900 p-2.5 space-y-1">
                 <h3 class="font-bold bg-slate-200 px-2 py-0.5 text-navy-900 uppercase text-[11px]">DADOS DO EMPREENDIMENTO / CLIENTE</h3>
                 <div class="grid grid-cols-2 gap-2 pt-1 text-[10px]">
-                    <p><strong>CLIENTE:</strong> <span id="pdf-out-client">--</span></p>
-                    <p><strong>ENDEREÇO:</strong> <span id="pdf-out-address">--</span></p>
-                    <p><strong>TEL.:</strong> <span id="pdf-out-phone">--</span></p>
-                    <p><strong>RESPONSÁVEL:</strong> <span id="pdf-out-resp">--</span></p>
+                    <p><strong>CLIENTE:</strong> <span id="pdf-out-client">-</span></p>
+                    <p><strong>ENDEREÇO:</strong> <span id="pdf-out-address">-</span></p>
+                    <p><strong>TEL.:</strong> <span id="pdf-out-phone">-</span></p>
+                    <p><strong>RESPONSÁVEL:</strong> <span id="pdf-out-resp">-</span></p>
                 </div>
             </div>
 
@@ -340,19 +331,19 @@
             <div class="border border-slate-900 p-2.5 space-y-1">
                 <h3 class="font-bold bg-slate-200 px-2 py-0.5 text-navy-900 uppercase text-[11px]">DADOS DO EQUIPAMENTO</h3>
                 <div class="grid grid-cols-3 gap-2 pt-1 text-[10px]">
-                    <p><strong>TAG:</strong> <span id="pdf-out-tag">--</span></p>
-                    <p><strong>EQUIPAMENTO:</strong> <span id="pdf-out-type">--</span></p>
-                    <p><strong>MARCA / MODELO:</strong> <span id="pdf-out-model">--</span></p>
-                    <p><strong>Nº DE SÉRIE:</strong> <span id="pdf-out-sn">--</span></p>
-                    <p><strong>Nº DA SALA:</strong> <span id="pdf-out-room">--</span></p>
-                    <p><strong>BTUS:</strong> <span id="pdf-out-btus">--</span></p>
-                    <p><strong>GÁS REFRIGERANTE:</strong> <span id="pdf-out-gas">--</span></p>
-                    <p><strong>ÁREA CLIMATIZADA:</strong> <span id="pdf-out-area">--</span></p>
-                    <p><strong>OCUPANTES:</strong> <span id="pdf-out-occupants">--</span></p>
+                    <p><strong>TAG:</strong> <span id="pdf-out-tag">-</span></p>
+                    <p><strong>EQUIPAMENTO:</strong> <span id="pdf-out-type">-</span></p>
+                    <p><strong>MARCA / MODELO:</strong> <span id="pdf-out-model">-</span></p>
+                    <p><strong>Nº DE SÉRIE:</strong> <span id="pdf-out-sn">-</span></p>
+                    <p><strong>Nº DA SALA:</strong> <span id="pdf-out-room">-</span></p>
+                    <p><strong>BTUS:</strong> <span id="pdf-out-btus">-</span></p>
+                    <p><strong>GÁS REFRIGERANTE:</strong> <span id="pdf-out-gas">-</span></p>
+                    <p><strong>ÁREA CLIMATIZADA:</strong> <span id="pdf-out-area">-</span></p>
+                    <p><strong>OCUPANTES:</strong> <span id="pdf-out-occupants">-</span></p>
                 </div>
             </div>
 
-            <!-- Tabela de Itens de Checklist do PDF -->
+            <!-- Tabela de Itens de Checklist -->
             <div class="border border-slate-900">
                 <div class="bg-navy-900 text-white font-bold p-1 text-center text-xs">SERVIÇO EXECUTADO E CHECKLIST</div>
                 <table class="w-full border-collapse text-[9px]">
@@ -372,7 +363,7 @@
             <!-- Observações Gerais -->
             <div class="border border-slate-900 p-2 space-y-1">
                 <h4 class="font-bold text-navy-900 text-[10px]">OBSERVAÇÕES TÉCNICAS GERAIS:</h4>
-                <p id="pdf-out-general-obs" class="text-[10px] text-slate-800 min-h-[30px]">Nenhuma observação técnica adicional.</p>
+                <p id="pdf-out-general-obs" class="text-[10px] text-slate-800 min-h-[25px]">Nenhuma observação técnica adicional.</p>
             </div>
 
             <!-- Foto da Etiqueta no PDF (se anexada) -->
@@ -384,16 +375,16 @@
     </div>
 
     <script>
-        // Registra o Service Worker físico (sw.js)
+        // Registra Service Worker se disponível
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW registrado com sucesso:', reg.scope))
-                    .catch(err => console.log('Falha ao registrar SW:', err));
+                    .then(reg => console.log('SW ativo no escopo:', reg.scope))
+                    .catch(err => console.log('Aviso SW:', err));
             });
         }
 
-        // PWA Prompt Event handling
+        // PWA Prompt Event logic
         let deferredPwaPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -405,9 +396,11 @@
         function handleInstallClick() {
             if (deferredPwaPrompt) {
                 deferredPwaPrompt.prompt();
-                deferredPwaPrompt.userChoice.then((choice) => {
+                deferredPwaPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        dismissPwaBanner();
+                    }
                     deferredPwaPrompt = null;
-                    dismissPwaBanner();
                 });
             } else {
                 openInstallModal();
@@ -426,7 +419,7 @@
             document.getElementById('install-instructions-modal').classList.add('hidden');
         }
 
-        // 11 Itens de inspeção oficiais do PDF
+        // 11 Itens de inspeção oficiais extraídos do documento PDF FRL Serviços
         const PDF_CHECKLIST_TASKS = [
             "Verificar se todas as funções estão operando",
             "Limpar o filtro de ar",
@@ -554,20 +547,20 @@
         async function generatePDFReport(e) {
             e.preventDefault();
 
-            // Pega dados inseridos
-            const clientName = document.getElementById('client-name').value;
-            const clientAddress = document.getElementById('client-address').value;
-            const clientPhone = document.getElementById('client-phone').value;
-            const clientResp = document.getElementById('client-resp').value;
+            // Pega dados inseridos (com fallback simples caso não preenchido)
+            const clientName = document.getElementById('client-name').value || '-';
+            const clientAddress = document.getElementById('client-address').value || '-';
+            const clientPhone = document.getElementById('client-phone').value || '-';
+            const clientResp = document.getElementById('client-resp').value || '-';
 
-            const eqTag = document.getElementById('eq-tag').value;
-            const eqType = document.getElementById('eq-type').value;
-            const eqBrand = document.getElementById('eq-brand').value;
-            const eqModel = document.getElementById('eq-model').value;
-            const eqSN = document.getElementById('eq-sn').value;
-            const eqRoom = document.getElementById('eq-room').value;
-            const eqBtus = document.getElementById('eq-btus').value || '7.500 BTUs';
-            const eqGas = document.getElementById('eq-gas').value || 'R-410A';
+            const eqTag = document.getElementById('eq-tag').value || 'HVAC-01';
+            const eqType = document.getElementById('eq-type').value || '-';
+            const eqBrand = document.getElementById('eq-brand').value || '-';
+            const eqModel = document.getElementById('eq-model').value || '-';
+            const eqSN = document.getElementById('eq-sn').value || '-';
+            const eqRoom = document.getElementById('eq-room').value || '-';
+            const eqBtus = document.getElementById('eq-btus').value || '-';
+            const eqGas = document.getElementById('eq-gas').value || '-';
             const eqArea = document.getElementById('eq-area').value || '-';
             const eqOccupants = document.getElementById('eq-occupants').value || '-';
 
@@ -582,7 +575,7 @@
 
             document.getElementById('pdf-out-tag').innerText = eqTag;
             document.getElementById('pdf-out-type').innerText = eqType;
-            document.getElementById('pdf-out-model').innerText = `${eqBrand} - ${eqModel}`;
+            document.getElementById('pdf-out-model').innerText = `${eqBrand} ${eqModel}`.trim() || '-';
             document.getElementById('pdf-out-sn').innerText = eqSN;
             document.getElementById('pdf-out-room').innerText = eqRoom;
             document.getElementById('pdf-out-btus').innerText = eqBtus;
@@ -643,7 +636,7 @@
 
             } catch (err) {
                 console.error('Erro ao gerar PDF:', err);
-                alert('Erro ao gerar relatório em PDF. Tente novamente.');
+                alert('Ocorreu um erro ao gerar o PDF. Tente novamente.');
             }
         }
     </script>
