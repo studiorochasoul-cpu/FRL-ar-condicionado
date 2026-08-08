@@ -111,9 +111,9 @@
         <form id="checklistForm" onsubmit="event.preventDefault(); openPdfModal();" class="space-y-6">
 
             <!-- SEÇÃO 1: DADOS DO EMPREENDIMENTO / CLIENTE -->
-            <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
-                <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
-                    <div class="p-2 bg-sky-50 text-sky-600 rounded-lg">
+            <section class="bg-sky-50/40 rounded-2xl p-4 sm:p-6 shadow-sm border border-sky-100 space-y-4">
+                <div class="flex items-center space-x-2 border-b border-sky-100 pb-3">
+                    <div class="p-2 bg-sky-100 text-sky-700 rounded-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                     </div>
                     <h2 class="font-bold text-slate-800 text-sm sm:text-base uppercase tracking-wider">Dados do Empreendimento / Cliente</h2>
@@ -122,27 +122,27 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Cliente</label>
-                        <input type="text" id="cliente" placeholder="Ex: Petrobras Macaé" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="cliente" placeholder="Ex: Petrobras Macaé" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Telefone</label>
-                        <input type="tel" id="telefone" placeholder="Ex: (22) 99999-8888" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="tel" id="telefone" placeholder="Ex: (22) 99999-8888" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Endereço</label>
-                        <input type="text" id="endereco" placeholder="Ex: Av. Elias Agostinho, 100 - Imbetiba, Macaé - RJ" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="endereco" placeholder="Ex: Av. Elias Agostinho, 100 - Imbetiba, Macaé - RJ" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Responsável</label>
-                        <input type="text" id="responsavel" placeholder="Ex: Carlos Silva (Supervisão)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="responsavel" placeholder="Ex: Carlos Silva (Supervisão)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all">
                     </div>
                 </div>
             </section>
 
             <!-- SEÇÃO 2: DADOS DO EQUIPAMENTO -->
-            <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
-                <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
-                    <div class="p-2 bg-sky-50 text-sky-600 rounded-lg">
+            <section class="bg-indigo-50/30 rounded-2xl p-4 sm:p-6 shadow-sm border border-indigo-100 space-y-4">
+                <div class="flex items-center space-x-2 border-b border-indigo-100 pb-3">
+                    <div class="p-2 bg-indigo-100 text-indigo-700 rounded-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
                     <h2 class="font-bold text-slate-800 text-sm sm:text-base uppercase tracking-wider">Dados do Equipamento</h2>
@@ -151,49 +151,49 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">TAG do Equipamento</label>
-                        <input type="text" id="tag" placeholder="Ex: ACJ-ADM-01" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-mono">
+                        <input type="text" id="tag" placeholder="Ex: ACJ-ADM-01" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-mono">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Tipo de Equipamento</label>
-                        <input type="text" id="equipamento" placeholder="Ex: Ar Condicionado de Janela / Split" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="equipamento" placeholder="Ex: Ar Condicionado de Janela / Split" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Modelo</label>
-                        <input type="text" id="modelo" placeholder="Ex: Hisense 7.5K / Carrier" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="modelo" placeholder="Ex: Hisense 7.5K / Carrier" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Número de Série</label>
-                        <input type="text" id="numeroSerie" placeholder="Ex: 998234-AX01" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-mono">
+                        <input type="text" id="numeroSerie" placeholder="Ex: 998234-AX01" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-mono">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Nº da Sala / Local</label>
-                        <input type="text" id="numeroSala" placeholder="Ex: Sala 102 - Gerência" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="numeroSala" placeholder="Ex: Sala 102 - Gerência" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Capacidade (BTUs)</label>
-                        <input type="text" id="btus" placeholder="Ex: 7.500 BTUs / 12.000 BTUs" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="btus" placeholder="Ex: 7.500 BTUs / 12.000 BTUs" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Gás Refrigerante</label>
-                        <input type="text" id="gasRefrigerante" placeholder="Ex: R-410A / R-32 / R-22" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="gasRefrigerante" placeholder="Ex: R-410A / R-32 / R-22" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Área Climatizada</label>
-                        <input type="text" id="areaClimatizada" placeholder="Ex: 25 m²" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="areaClimatizada" placeholder="Ex: 25 m²" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Ocupantes (Fixos / Variáveis)</label>
-                        <input type="text" id="ocupantes" placeholder="Ex: 4 Fixos / 10 Variáveis" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        <input type="text" id="ocupantes" placeholder="Ex: 4 Fixos / 10 Variáveis" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                     </div>
                 </div>
 
                 <!-- Foto da Etiqueta do Equipamento -->
-                <div class="pt-3 border-t border-slate-100">
+                <div class="pt-3 border-t border-indigo-100">
                     <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Foto da Etiqueta do Equipamento (Placa de Identificação)</label>
                     <div class="flex items-center justify-center w-full">
-                        <label id="tagPhotoBox" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100/80 transition-all text-center p-3 relative overflow-hidden">
+                        <label id="tagPhotoBox" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-indigo-200 rounded-2xl cursor-pointer bg-white hover:bg-slate-50 transition-all text-center p-3 relative overflow-hidden">
                             <div id="tagPhotoPlaceholder" class="flex flex-col items-center justify-center">
-                                <svg class="w-8 h-8 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h0.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <svg class="w-8 h-8 text-indigo-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h0.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span class="text-xs font-semibold text-slate-600">Tirar Foto ou Anexar Imagem</span>
                                 <span class="text-[10px] text-slate-400 mt-0.5">Capturar modelo e nº de série na etiqueta</span>
                             </div>
@@ -205,15 +205,15 @@
             </section>
 
             <!-- SEÇÃO 3: CHECKLIST DE SERVIÇOS EXECUTADOS - MANUTENÇÃO PREVENTIVA (15 ITENS) -->
-            <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <section class="bg-emerald-50/30 rounded-2xl p-4 sm:p-6 shadow-sm border border-emerald-100 space-y-4">
+                <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
                     <div class="flex items-center space-x-2">
-                        <div class="p-2 bg-sky-50 text-sky-600 rounded-lg">
+                        <div class="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <h2 class="font-bold text-slate-800 text-sm sm:text-base uppercase tracking-wider">Itens de Manutenção Preventiva</h2>
                     </div>
-                    <span id="maintProgress" class="text-xs font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100">0 / 15 Concluídos</span>
+                    <span id="maintProgress" class="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full border border-emerald-200">0 / 15 Concluídos</span>
                 </div>
 
                 <p class="text-xs text-slate-500">Selecione o status de cada item de manutenção, adicione observações, foto da execução e valor de orçamento caso necessário.</p>
@@ -223,31 +223,31 @@
                 </div>
 
                 <!-- Campos no Fim da Seção de Manutenção: Nome do Técnico e Nome do Cliente -->
-                <div class="pt-4 border-t border-slate-200 space-y-4">
+                <div class="pt-4 border-t border-emerald-100 space-y-4">
                     <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Responsáveis pela Manutenção</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Nome do Técnico</label>
-                            <input type="text" id="nomeTecnico" placeholder="Ex: João Souza" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                            <input type="text" id="nomeTecnico" placeholder="Ex: João Souza" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Nome do Cliente</label>
-                            <input type="text" id="nomeCliente" placeholder="Ex: Maria Oliveira" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                            <input type="text" id="nomeCliente" placeholder="Ex: Maria Oliveira" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- SEÇÃO 4: INSTALAÇÃO DE EQUIPAMENTOS (10 ITENS) -->
-            <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <section class="bg-amber-50/30 rounded-2xl p-4 sm:p-6 shadow-sm border border-amber-100 space-y-4">
+                <div class="flex items-center justify-between border-b border-amber-100 pb-3">
                     <div class="flex items-center space-x-2">
-                        <div class="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                        <div class="p-2 bg-amber-100 text-amber-700 rounded-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a2 2 0 01-2 2 2 2 0 01-2-2V4zm-6 8a2 2 0 100-4 2 2 0 000 4zm12 0a2 2 0 100-4 2 2 0 000 4zm-6 8a2 2 0 100-4 2 2 0 000 4z"/></svg>
                         </div>
                         <h2 class="font-bold text-slate-800 text-sm sm:text-base uppercase tracking-wider">Instalação de Equipamentos</h2>
                     </div>
-                    <span id="instProgress" class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100">0 / 10 Concluídos</span>
+                    <span id="instProgress" class="text-xs font-bold text-amber-700 bg-amber-100/80 px-2.5 py-1 rounded-full border border-amber-200">0 / 10 Concluídos</span>
                 </div>
 
                 <p class="text-xs text-slate-500">Selecione o status de cada item de instalação, adicione observações, foto da execução e valor de orçamento caso necessário.</p>
@@ -258,14 +258,14 @@
             </section>
 
             <!-- SEÇÃO 5: DATA E OBSERVAÇÕES GERAIS -->
-            <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+            <section class="bg-slate-100/70 rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Data do Atendimento</label>
-                    <input type="date" id="dataManutencao" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                    <input type="date" id="dataManutencao" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Observações Técnicas Gerais</label>
-                    <textarea id="observacoesGerais" rows="3" placeholder="Adicione detalhes sobre peças trocadas, medições elétricas/pressão específicas ou recomendações ao cliente..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"></textarea>
+                    <textarea id="observacoesGerais" rows="3" placeholder="Adicione detalhes sobre peças trocadas, medições elétricas/pressão específicas ou recomendações ao cliente..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"></textarea>
                 </div>
             </section>
 
@@ -357,7 +357,7 @@
 
     <!-- SCRIPTS E LÓGICA DA APLICAÇÃO -->
     <script>
-        // Lista de Itens de Manutenção Preventiva (11 originais do PDF + 4 novos)
+        // Lista de Itens de Manutenção Preventiva
         const maintenanceTasks = [
             "Verificar se todas as funções estão operando",
             "Limpar o filtro de ar",
@@ -376,7 +376,7 @@
             "O equipamento apresenta alguma avaria que precisa de substituição?"
         ];
 
-        // Lista de Itens de Instalação de Equipamentos (10 novos)
+        // Lista de Itens de Instalação de Equipamentos
         const installationTasks = [
             "Será necessário troca do equipamento?",
             "Será Necessário realizar infra de rede frigorígena nova?",
@@ -441,7 +441,7 @@
 
             maintenanceTasks.forEach((task, index) => {
                 const itemHtml = `
-                    <div class="p-3 sm:p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
+                    <div class="p-3 sm:p-4 bg-white/90 rounded-2xl border border-slate-200/80 space-y-3">
                         <div class="flex items-start justify-between gap-2">
                             <span class="text-xs font-bold text-navy-900 bg-sky-100 text-sky-800 px-2 py-0.5 rounded-md">${index + 1}</span>
                             <p class="text-xs sm:text-sm font-semibold text-slate-800 flex-1">${task}</p>
@@ -505,7 +505,7 @@
 
             installationTasks.forEach((task, index) => {
                 const itemHtml = `
-                    <div class="p-3 sm:p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
+                    <div class="p-3 sm:p-4 bg-white/90 rounded-2xl border border-slate-200/80 space-y-3">
                         <div class="flex items-start justify-between gap-2">
                             <span class="text-xs font-bold text-amber-900 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md">${index + 1}</span>
                             <p class="text-xs sm:text-sm font-semibold text-slate-800 flex-1">${task}</p>
@@ -732,16 +732,18 @@
             // Preenche o Elemento HTML do Relatório visível
             const reportEl = document.getElementById('pdfReportElement');
             reportEl.innerHTML = `
-                <!-- CABEÇALHO OFICIAL FRL SERVIÇOS -->
+                <!-- CABEÇALHO OFICIAL FRL SERVIÇOS E COMÉRCIO LTDA. -->
                 <table style="width: 100%; border-bottom: 2px solid #002B49; padding-bottom: 8px; margin-bottom: 12px; border-collapse: collapse;">
                     <tr>
+                        <td style="vertical-align: middle; width: 52px; padding-right: 10px;">
+                            <img src="icone.png" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; display: block;" onerror="this.style.display='none'">
+                        </td>
                         <td style="vertical-align: top;">
-                            <h1 style="font-size: 20px; font-weight: bold; color: #002B49; margin: 0; line-height: 1;">FRL SERVIÇOS</h1>
+                            <h1 style="font-size: 15px; font-weight: bold; color: #002B49; margin: 0; line-height: 1.2;">FRL serviços e comércio Ltda.</h1>
                             <p style="font-size: 9px; color: #475569; margin: 3px 0 0 0;">CNPJ: 58.475.400/0001-33</p>
-                            <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">EST. Antônio Guimarães Mosqueira Nº1301 - Parque Atlântico, Macaé-RJ</p>
                             <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">TEL: (22) 99961-5971 | E-mail: admfrservicos@gmail.com</p>
                         </td>
-                        <td style="vertical-align: top; text-align: right; width: 160px;">
+                        <td style="vertical-align: top; text-align: right; width: 140px;">
                             <span style="font-size: 10px; font-weight: bold; background-color: #002B49; color: #ffffff; padding: 4px 8px; border-radius: 4px; display: inline-block;">RELATÓRIO TÉCNICO</span>
                             <p style="font-size: 9px; color: #64748b; margin: 6px 0 0 0;">DATA: ${dataManutencao}</p>
                         </td>
@@ -872,12 +874,38 @@
 
             try {
                 const element = document.getElementById('pdfReportElement');
-                const tag = document.getElementById('tag').value || 'Equipamento';
-                const dataManutencao = document.getElementById('dataManutencao').value || 'hoje';
+                const clienteInput = (document.getElementById('cliente').value || '').trim();
+                
+                // Pega o primeiro nome do cliente
+                let primeiroNome = '';
+                if (clienteInput) {
+                    primeiroNome = clienteInput.split(/\s+/)[0].replace(/[^a-zA-Z0-9À-ÿ]/g, '');
+                }
+
+                // Data no formato do Brasil (DD-MM-AAAA)
+                const dataManutencaoRaw = document.getElementById('dataManutencao').value;
+                let dataFormatada = '';
+                if (dataManutencaoRaw) {
+                    const [ano, mes, dia] = dataManutencaoRaw.split('-');
+                    dataFormatada = `${dia}-${mes}-${ano}`;
+                } else {
+                    const hoje = new Date();
+                    const dia = String(hoje.getDate()).padStart(2, '0');
+                    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                    const ano = hoje.getFullYear();
+                    dataFormatada = `${dia}-${mes}-${ano}`;
+                }
+
+                // Nome do PDF: FRL + primeiro nome do Cliente + data no padrão do Brasil
+                let fileNamePdf = 'FRL';
+                if (primeiroNome) {
+                    fileNamePdf += `_${primeiroNome}`;
+                }
+                fileNamePdf += `_${dataFormatada}.pdf`;
 
                 const opt = {
                     margin:       [6, 6, 6, 6],
-                    filename:     `Checklist_FRL_${tag.replace(/[^a-zA-Z0-9]/g, '_')}_${dataManutencao}.pdf`,
+                    filename:     fileNamePdf,
                     image:        { type: 'jpeg', quality: 0.98 },
                     html2canvas:  { scale: 2, useCORS: true, allowTaint: true, scrollX: 0, scrollY: 0 },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
