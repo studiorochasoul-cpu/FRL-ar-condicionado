@@ -56,11 +56,36 @@
             if (btn) btn.style.display = 'none';
         });
     </script>
+
+    <style>
+        /* ESTILOS EXCLUSIVOS PARA IMPRESSÃO / SALVAR EM PDF NATIVO DO NAVEGADOR */
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #pdfReportElement, #pdfReportElement * {
+                visibility: visible !important;
+            }
+            #pdfReportElement {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 10mm !important;
+                background: #ffffff !important;
+                box-shadow: none !important;
+            }
+            #pdfPreviewModalHeader, header, footer, main, #installModal {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 <body class="h-full text-slate-800 antialiased flex flex-col justify-between selection:bg-sky-500 selection:text-white">
 
     <!-- TOPO FIXO / NAVEGAÇÃO SUPERIOR -->
-    <header class="sticky top-0 z-50 bg-navy-900 text-white shadow-lg border-b border-navy-800">
+    <header class="sticky top-0 z-40 bg-navy-900 text-white shadow-lg border-b border-navy-800">
         <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <img src="icone.png" alt="FRL Serviços" class="w-10 h-10 object-cover rounded-xl shadow-md border border-sky-400/30" id="headerLogoImg" onerror="handleLogoError(this)">
@@ -83,7 +108,7 @@
     <!-- CONTEÚDO PRINCIPAL (FORMULÁRIO DE CHECKLIST) -->
     <main class="flex-grow max-w-3xl w-full mx-auto px-3 sm:px-6 py-6 space-y-6">
         
-        <form id="checklistForm" onsubmit="event.preventDefault(); generatePDF();" class="space-y-6">
+        <form id="checklistForm" onsubmit="event.preventDefault(); openPdfModal();" class="space-y-6">
 
             <!-- SEÇÃO 1: DADOS DO EMPREENDIMENTO / CLIENTE -->
             <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
@@ -179,7 +204,7 @@
                 </div>
             </section>
 
-            <!-- SEÇÃO 3: CHECKLIST DE SERVIÇOS EXECUTADOS (11 ITENS DO PDF) -->
+            <!-- SEÇÃO 3: CHECKLIST DE SERVIÇOS EXECUTADOS - MANUTENÇÃO PREVENTIVA (15 ITENS) -->
             <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div class="flex items-center space-x-2">
@@ -188,20 +213,54 @@
                         </div>
                         <h2 class="font-bold text-slate-800 text-sm sm:text-base uppercase tracking-wider">Itens de Manutenção Preventiva</h2>
                     </div>
-                    <span id="checklistProgress" class="text-xs font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100">0 / 11 Concluídos</span>
+                    <span id="maintProgress" class="text-xs font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100">0 / 15 Concluídos</span>
                 </div>
 
-                <p class="text-xs text-slate-500">Selecione o status de cada item, adicione observações, foto da execução e valor de orçamento caso necessário.</p>
+                <p class="text-xs text-slate-500">Selecione o status de cada item de manutenção, adicione observações, foto da execução e valor de orçamento caso necessário.</p>
 
-                <div id="checklistItemsContainer" class="space-y-4">
+                <div id="maintItemsContainer" class="space-y-4">
+                    <!-- Gerado via JavaScript -->
+                </div>
+
+                <!-- Campos no Fim da Seção de Manutenção: Nome do Técnico e Nome do Cliente -->
+                <div class="pt-4 border-t border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Responsáveis pela Manutenção</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Nome do Técnico</label>
+                            <input type="text" id="nomeTecnico" placeholder="Ex: João Souza" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Nome do Cliente</label>
+                            <input type="text" id="nomeCliente" placeholder="Ex: Maria Oliveira" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 4: INSTALAÇÃO DE EQUIPAMENTOS (10 ITENS) -->
+            <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <div class="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a2 2 0 01-2 2 2 2 0 01-2-2V4zm-6 8a2 2 0 100-4 2 2 0 000 4zm12 0a2 2 0 100-4 2 2 0 000 4zm-6 8a2 2 0 100-4 2 2 0 000 4z"/></svg>
+                        </div>
+                        <h2 class="font-bold text-slate-800 text-sm sm:text-base uppercase tracking-wider">Instalação de Equipamentos</h2>
+                    </div>
+                    <span id="instProgress" class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100">0 / 10 Concluídos</span>
+                </div>
+
+                <p class="text-xs text-slate-500">Selecione o status de cada item de instalação, adicione observações, foto da execução e valor de orçamento caso necessário.</p>
+
+                <div id="instItemsContainer" class="space-y-4">
                     <!-- Gerado via JavaScript -->
                 </div>
             </section>
 
-            <!-- SEÇÃO 4: DATA E OBSERVAÇÕES GERAIS -->
+            <!-- SEÇÃO 5: DATA E OBSERVAÇÕES GERAIS -->
             <section class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Data da Manutenção</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Data do Atendimento</label>
                     <input type="date" id="dataManutencao" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
                 </div>
                 <div>
@@ -212,7 +271,7 @@
 
             <!-- BOTÃO GERAR RELATÓRIO PDF -->
             <div class="pt-2">
-                <button type="submit" id="btnGeneratePdf" class="w-full py-4 bg-navy-900 hover:bg-navy-800 active:bg-slate-900 text-white font-bold text-base rounded-2xl shadow-xl flex items-center justify-center space-x-2 transition-all duration-200 transform active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed">
+                <button type="submit" class="w-full py-4 bg-navy-900 hover:bg-navy-800 active:bg-slate-900 text-white font-bold text-base rounded-2xl shadow-xl flex items-center justify-center space-x-2 transition-all duration-200 transform active:scale-[0.99]">
                     <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     <span>GERAR RELATÓRIO PDF FRL SERVIÇOS</span>
                 </button>
@@ -226,6 +285,40 @@
     <footer class="w-full py-5 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white/50 mt-8">
         <p>Desenvolvido por <a href="https://www.instagram.com/rochasoulmusic" target="_blank" rel="noopener noreferrer" class="text-sky-600 font-semibold hover:underline hover:text-sky-500 transition-colors">@rochasoulmusic</a></p>
     </footer>
+
+    <!-- MODAL DE PRÉ-VISUALIZAÇÃO E DOWNLOAD DE PDF -->
+    <div id="pdfModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-between p-2 sm:p-4 overflow-y-auto">
+        
+        <!-- Cabeçalho de Ações do Modal -->
+        <div id="pdfPreviewModalHeader" class="w-full max-w-3xl bg-white rounded-2xl p-3 mb-3 shadow-lg flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+                <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Relatório FRL Serviços Pronto</h3>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="downloadPdfDirect()" id="btnDownloadPdf" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow flex items-center gap-1 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Baixar PDF</span>
+                </button>
+                <button onclick="window.print()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow flex items-center gap-1 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    <span>Imprimir</span>
+                </button>
+                <button onclick="closePdfModal()" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all">
+                    ✕
+                </button>
+            </div>
+        </div>
+
+        <!-- Área de Visualização do Documento PDF -->
+        <div class="w-full max-w-3xl flex-grow overflow-y-auto bg-slate-100 rounded-2xl p-2 sm:p-4 flex justify-center">
+            <div id="pdfReportElement" class="w-full bg-white text-slate-800 p-4 sm:p-8 rounded-xl shadow-xl font-sans text-xs box-border border border-slate-200">
+                <!-- Conteúdo Injetado via JavaScript -->
+            </div>
+        </div>
+
+    </div>
 
     <!-- MODAL INFORMATIVO DE INSTALAÇÃO (CASO O NAVEGADOR NÃO OFEREÇA PROMPT DIRETO) -->
     <div id="installModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -264,8 +357,8 @@
 
     <!-- SCRIPTS E LÓGICA DA APLICAÇÃO -->
     <script>
-        // Lista Oficial dos 11 itens extraídos do PDF anexo FRL Serviços
-        const checklistTasks = [
+        // Lista de Itens de Manutenção Preventiva (11 originais do PDF + 4 novos)
+        const maintenanceTasks = [
             "Verificar se todas as funções estão operando",
             "Limpar o filtro de ar",
             "Verificar se a água de condensação está sendo drenada livremente.",
@@ -276,11 +369,30 @@
             "Lavar a serpentina da unidade evaporadora",
             "Lavar a Unidade Condensadora - Externa",
             "Verificar a isolação elétrica de motores e compressores",
-            "Medir pressões de funcionamento"
+            "Medir pressões de funcionamento",
+            "O equipamento apresenta odores desagradáveis?",
+            "Foi utilizado bactericida?",
+            "O termostatos, controle e sensores estão funcionando normalmente?",
+            "O equipamento apresenta alguma avaria que precisa de substituição?"
+        ];
+
+        // Lista de Itens de Instalação de Equipamentos (10 novos)
+        const installationTasks = [
+            "Será necessário troca do equipamento?",
+            "Será Necessário realizar infra de rede frigorígena nova?",
+            "Foi utilizado o tamanho da tubulação conforme manual?",
+            "Foi realizado teste de estanqueidade com nitrogênio?",
+            "Foi utilizado bomba de vácuo?",
+            "Foi utilizado vacometro?",
+            "Será necessário carga de gás refrigerante?",
+            "Foi necessário realizar infra de elétrica?",
+            "Foi utilizado terminais elétricos?",
+            "Foram utilizados epis adequados conforme as normas?"
         ];
 
         // Estado das Fotos dos itens
-        const itemPhotos = {};
+        const maintPhotos = {};
+        const instPhotos = {};
         let tagPhotoBase64 = null;
 
         // Formatar input para moeda Real (R$)
@@ -298,7 +410,8 @@
 
         // Ao Carregar a Página
         window.addEventListener('DOMContentLoaded', () => {
-            renderChecklistItems();
+            renderMaintenanceItems();
+            renderInstallationItems();
             
             // Define data de hoje por padrão
             const today = new Date().toISOString().split('T')[0];
@@ -321,12 +434,12 @@
             }
         }
 
-        // Renderiza os 11 itens do checklist
-        function renderChecklistItems() {
-            const container = document.getElementById('checklistItemsContainer');
+        // Renderiza os 15 itens da Manutenção Preventiva
+        function renderMaintenanceItems() {
+            const container = document.getElementById('maintItemsContainer');
             container.innerHTML = '';
 
-            checklistTasks.forEach((task, index) => {
+            maintenanceTasks.forEach((task, index) => {
                 const itemHtml = `
                     <div class="p-3 sm:p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
                         <div class="flex items-start justify-between gap-2">
@@ -337,32 +450,32 @@
                         <!-- Opções de Status (OK, NÃO OK, N/A) -->
                         <div class="flex items-center gap-2 pt-1">
                             <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="status_${index}" value="OK" onchange="updateProgress()" class="peer hidden">
+                                <input type="radio" name="maint_status_${index}" value="OK" onchange="updateMaintProgress()" class="peer hidden">
                                 <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600 transition-all shadow-sm">
                                     ✓ OK
                                 </div>
                             </label>
                             <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="status_${index}" value="NÃO OK" onchange="updateProgress()" class="peer hidden">
+                                <input type="radio" name="maint_status_${index}" value="NÃO OK" onchange="updateMaintProgress()" class="peer hidden">
                                 <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-600 transition-all shadow-sm">
                                     ✕ NÃO OK
                                 </div>
                             </label>
                             <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="status_${index}" value="N/A" onchange="updateProgress()" class="peer hidden">
+                                <input type="radio" name="maint_status_${index}" value="N/A" onchange="updateMaintProgress()" class="peer hidden">
                                 <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-slate-500 peer-checked:text-white peer-checked:border-slate-500 transition-all shadow-sm">
                                     – N/A
                                 </div>
                             </label>
                         </div>
 
-                        <!-- Campos Adicionais: Obs, Foto e Orçamento -->
+                        <!-- Campos Adicionais: Obs e Orçamento -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                             <div>
-                                <input type="text" id="obs_${index}" placeholder="Obs. Ex: Filtro higienizado" class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                                <input type="text" id="maint_obs_${index}" placeholder="Obs. Ex: Filtro higienizado" class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
                             </div>
                             <div>
-                                <input type="text" id="orcamento_${index}" inputmode="numeric" placeholder="Orçamento R$ 0,00" oninput="formatCurrencyInput(this)" class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-700">
+                                <input type="text" id="maint_orcamento_${index}" inputmode="numeric" placeholder="Orçamento R$ 0,00" oninput="formatCurrencyInput(this)" class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-700">
                             </div>
                         </div>
 
@@ -371,12 +484,12 @@
                             <label class="cursor-pointer inline-flex items-center space-x-1.5 text-xs text-sky-600 font-semibold hover:text-sky-700">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h0.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span>Anexar Foto da Execução</span>
-                                <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleItemPhoto(${index}, this)">
+                                <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleItemPhoto('maint', ${index}, this)">
                             </label>
 
-                            <div id="itemPhotoPreviewContainer_${index}" class="hidden flex items-center space-x-2">
-                                <img id="itemPhotoPreview_${index}" class="w-8 h-8 object-cover rounded-lg border border-slate-300">
-                                <button type="button" onclick="removeItemPhoto(${index})" class="text-red-500 hover:text-red-700 text-xs font-bold">✕</button>
+                            <div id="maintPhotoPreviewContainer_${index}" class="hidden flex items-center space-x-2">
+                                <img id="maintPhotoPreview_${index}" class="w-8 h-8 object-cover rounded-lg border border-slate-300">
+                                <button type="button" onclick="removeItemPhoto('maint', ${index})" class="text-red-500 hover:text-red-700 text-xs font-bold">✕</button>
                             </div>
                         </div>
                     </div>
@@ -385,14 +498,87 @@
             });
         }
 
-        // Atualiza barra de progresso
-        function updateProgress() {
+        // Renderiza os 10 itens da Instalação de Equipamentos
+        function renderInstallationItems() {
+            const container = document.getElementById('instItemsContainer');
+            container.innerHTML = '';
+
+            installationTasks.forEach((task, index) => {
+                const itemHtml = `
+                    <div class="p-3 sm:p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div class="flex items-start justify-between gap-2">
+                            <span class="text-xs font-bold text-amber-900 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md">${index + 1}</span>
+                            <p class="text-xs sm:text-sm font-semibold text-slate-800 flex-1">${task}</p>
+                        </div>
+
+                        <!-- Opções de Status (OK, NÃO OK, N/A) -->
+                        <div class="flex items-center gap-2 pt-1">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="inst_status_${index}" value="OK" onchange="updateInstProgress()" class="peer hidden">
+                                <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600 transition-all shadow-sm">
+                                    ✓ OK
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="inst_status_${index}" value="NÃO OK" onchange="updateInstProgress()" class="peer hidden">
+                                <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-600 transition-all shadow-sm">
+                                    ✕ NÃO OK
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="inst_status_${index}" value="N/A" onchange="updateInstProgress()" class="peer hidden">
+                                <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-slate-500 peer-checked:text-white peer-checked:border-slate-500 transition-all shadow-sm">
+                                    – N/A
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Campos Adicionais: Obs e Orçamento -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            <div>
+                                <input type="text" id="inst_obs_${index}" placeholder="Obs. Ex: Tubulação 1/4 e 3/8" class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <input type="text" id="inst_orcamento_${index}" inputmode="numeric" placeholder="Orçamento R$ 0,00" oninput="formatCurrencyInput(this)" class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium text-slate-700">
+                            </div>
+                        </div>
+
+                        <!-- Anexo de Foto do Item -->
+                        <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200">
+                            <label class="cursor-pointer inline-flex items-center space-x-1.5 text-xs text-amber-600 font-semibold hover:text-amber-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h0.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>Anexar Foto da Execução</span>
+                                <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleItemPhoto('inst', ${index}, this)">
+                            </label>
+
+                            <div id="instPhotoPreviewContainer_${index}" class="hidden flex items-center space-x-2">
+                                <img id="instPhotoPreview_${index}" class="w-8 h-8 object-cover rounded-lg border border-slate-300">
+                                <button type="button" onclick="removeItemPhoto('inst', ${index})" class="text-red-500 hover:text-red-700 text-xs font-bold">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+
+        // Atualiza barras de progresso
+        function updateMaintProgress() {
             let count = 0;
-            checklistTasks.forEach((_, idx) => {
-                const selected = document.querySelector(`input[name="status_${idx}"]:checked`);
+            maintenanceTasks.forEach((_, idx) => {
+                const selected = document.querySelector(`input[name="maint_status_${idx}"]:checked`);
                 if (selected) count++;
             });
-            document.getElementById('checklistProgress').innerText = `${count} / 11 Concluídos`;
+            document.getElementById('maintProgress').innerText = `${count} / 15 Concluídos`;
+        }
+
+        function updateInstProgress() {
+            let count = 0;
+            installationTasks.forEach((_, idx) => {
+                const selected = document.querySelector(`input[name="inst_status_${idx}"]:checked`);
+                if (selected) count++;
+            });
+            document.getElementById('instProgress').innerText = `${count} / 10 Concluídos`;
         }
 
         // Pré-visualização da Foto da Etiqueta
@@ -410,25 +596,34 @@
             }
         }
 
-        // Manipula foto por item do checklist
-        function handleItemPhoto(index, input) {
+        // Manipula foto por item de checklist (maint ou inst)
+        function handleItemPhoto(section, index, input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    itemPhotos[index] = e.target.result;
-                    const container = document.getElementById(`itemPhotoPreviewContainer_${index}`);
-                    const preview = document.getElementById(`itemPhotoPreview_${index}`);
-                    preview.src = e.target.result;
-                    container.classList.remove('hidden');
+                    if (section === 'maint') {
+                        maintPhotos[index] = e.target.result;
+                        document.getElementById(`maintPhotoPreview_${index}`).src = e.target.result;
+                        document.getElementById(`maintPhotoPreviewContainer_${index}`).classList.remove('hidden');
+                    } else {
+                        instPhotos[index] = e.target.result;
+                        document.getElementById(`instPhotoPreview_${index}`).src = e.target.result;
+                        document.getElementById(`instPhotoPreviewContainer_${index}`).classList.remove('hidden');
+                    }
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         // Remove foto do item
-        function removeItemPhoto(index) {
-            delete itemPhotos[index];
-            document.getElementById(`itemPhotoPreviewContainer_${index}`).classList.add('hidden');
+        function removeItemPhoto(section, index) {
+            if (section === 'maint') {
+                delete maintPhotos[index];
+                document.getElementById(`maintPhotoPreviewContainer_${index}`).classList.add('hidden');
+            } else {
+                delete instPhotos[index];
+                document.getElementById(`instPhotoPreviewContainer_${index}`).classList.add('hidden');
+            }
         }
 
         // Ação do Botão de Instalação PWA
@@ -454,50 +649,40 @@
             document.getElementById('installModal').classList.add('hidden');
         }
 
-        // GERAÇÃO DO RELATÓRIO PDF FRL SERVIÇOS
-        async function generatePDF() {
-            const btn = document.getElementById('btnGeneratePdf');
-            const originalBtnHtml = btn.innerHTML;
-            
-            // Ativa estado de carregamento no botão
-            btn.disabled = true;
-            btn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-sky-400 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>GERANDO RELATÓRIO PDF, AGUARDE...</span>
-            `;
+        // ABRE O MODAL COM A PRÉ-VISUALIZAÇÃO COMPLETA E VISÍVEL DO PDF
+        function openPdfModal() {
+            const cliente = document.getElementById('cliente').value || '-';
+            const telefone = document.getElementById('telefone').value || '-';
+            const endereco = document.getElementById('endereco').value || '-';
+            const responsavel = document.getElementById('responsavel').value || '-';
 
-            try {
-                const cliente = document.getElementById('cliente').value || '-';
-                const telefone = document.getElementById('telefone').value || '-';
-                const endereco = document.getElementById('endereco').value || '-';
-                const responsavel = document.getElementById('responsavel').value || '-';
+            const tag = document.getElementById('tag').value || '-';
+            const equipamento = document.getElementById('equipamento').value || '-';
+            const modelo = document.getElementById('modelo').value || '-';
+            const numeroSerie = document.getElementById('numeroSerie').value || '-';
+            const numeroSala = document.getElementById('numeroSala').value || '-';
+            const btus = document.getElementById('btus').value || '-';
+            const gasRefrigerante = document.getElementById('gasRefrigerante').value || '-';
+            const areaClimatizada = document.getElementById('areaClimatizada').value || '-';
+            const ocupantes = document.getElementById('ocupantes').value || '-';
 
-                const tag = document.getElementById('tag').value || '-';
-                const equipamento = document.getElementById('equipamento').value || '-';
-                const modelo = document.getElementById('modelo').value || '-';
-                const numeroSerie = document.getElementById('numeroSerie').value || '-';
-                const numeroSala = document.getElementById('numeroSala').value || '-';
-                const btus = document.getElementById('btus').value || '-';
-                const gasRefrigerante = document.getElementById('gasRefrigerante').value || '-';
-                const areaClimatizada = document.getElementById('areaClimatizada').value || '-';
-                const ocupantes = document.getElementById('ocupantes').value || '-';
+            const nomeTecnico = document.getElementById('nomeTecnico').value || '-';
+            const nomeCliente = document.getElementById('nomeCliente').value || '-';
 
-                const dataManutencaoRaw = document.getElementById('dataManutencao').value;
-                const dataManutencao = dataManutencaoRaw ? 
-                    new Date(dataManutencaoRaw + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
-                const observacoesGerais = document.getElementById('observacoesGerais').value || 'Sem observações gerais.';
+            const dataManutencaoRaw = document.getElementById('dataManutencao').value;
+            const dataManutencao = dataManutencaoRaw ? 
+                new Date(dataManutencaoRaw + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
+            const observacoesGerais = document.getElementById('observacoesGerais').value || 'Sem observações gerais.';
 
-                // Linhas da Tabela do Checklist
-                let checklistRowsHtml = '';
-                checklistTasks.forEach((task, idx) => {
-                    const statusEl = document.querySelector(`input[name="status_${idx}"]:checked`);
+            // Função auxiliar para gerar linhas das tabelas no PDF
+            const buildRowsHtml = (tasks, prefix, photoObj) => {
+                let html = '';
+                tasks.forEach((task, idx) => {
+                    const statusEl = document.querySelector(`input[name="${prefix}_status_${idx}"]:checked`);
                     const status = statusEl ? statusEl.value : 'Pendente';
-                    const obs = document.getElementById(`obs_${idx}`).value.trim();
-                    const rawOrcamento = document.getElementById(`orcamento_${idx}`).value.trim();
-                    const photoBase64 = itemPhotos[idx];
+                    const obs = document.getElementById(`${prefix}_obs_${idx}`).value.trim();
+                    const rawOrcamento = document.getElementById(`${prefix}_orcamento_${idx}`).value.trim();
+                    const photoBase64 = photoObj[idx];
 
                     let statusColor = '#64748b';
                     if (status === 'OK') statusColor = '#15803d';
@@ -520,17 +705,17 @@
 
                     let photoHtml = '';
                     if (photoBase64) {
-                        photoHtml = `<div style="margin-top: 4px;"><img src="${photoBase64}" style="max-height: 55px; max-width: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; display: block;" /></div>`;
+                        photoHtml = `<div style="margin-top: 4px;"><img src="${photoBase64}" style="max-height: 50px; max-width: 90px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; display: block;" /></div>`;
                     }
 
-                    checklistRowsHtml += `
+                    html += `
                         <tr style="border-bottom: 1px solid #e2e8f0; ${idx % 2 === 0 ? 'background-color: #f8fafc;' : 'background-color: #ffffff;'}">
-                            <td style="padding: 6px 8px; font-weight: bold; width: 24px; text-align: center; color: #002B49; vertical-align: top;">${idx + 1}</td>
-                            <td style="padding: 6px 8px; font-size: 10px; color: #1e293b; line-height: 1.3; vertical-align: top;">${task}</td>
-                            <td style="padding: 6px 8px; font-weight: bold; font-size: 10px; text-align: center; width: 70px; color: ${statusColor}; vertical-align: top;">
+                            <td style="padding: 5px 8px; font-weight: bold; width: 24px; text-align: center; color: #002B49; vertical-align: top;">${idx + 1}</td>
+                            <td style="padding: 5px 8px; font-size: 9.5px; color: #1e293b; line-height: 1.3; vertical-align: top;">${task}</td>
+                            <td style="padding: 5px 8px; font-weight: bold; font-size: 9.5px; text-align: center; width: 70px; color: ${statusColor}; vertical-align: top;">
                                 ${status}
                             </td>
-                            <td style="padding: 6px 8px; font-size: 9px; color: #334155; vertical-align: top;">
+                            <td style="padding: 5px 8px; font-size: 8.5px; color: #334155; vertical-align: top;">
                                 ${obs ? `<div style="margin-bottom: 2px;"><strong>Obs:</strong> ${obs}</div>` : ''}
                                 ${orcamentoFormatted ? `<div style="margin-bottom: 2px;"><strong>Orçamento:</strong> ${orcamentoFormatted}</div>` : ''}
                                 ${photoHtml}
@@ -538,140 +723,170 @@
                         </tr>
                     `;
                 });
+                return html;
+            };
 
-                // Criar container de renderização do PDF e anexa-lo temporariamente ao DOM (SOLUÇÃO DO PDF EM BRANCO)
-                const pdfContainer = document.createElement('div');
-                pdfContainer.id = 'pdfRenderContainer';
-                pdfContainer.style.position = 'absolute';
-                pdfContainer.style.left = '-9999px';
-                pdfContainer.style.top = '0';
-                pdfContainer.style.width = '750px';
-                pdfContainer.style.backgroundColor = '#ffffff';
-                pdfContainer.style.fontFamily = 'Arial, sans-serif';
-                pdfContainer.style.fontSize = '11px';
-                pdfContainer.style.color = '#1e293b';
-                pdfContainer.style.padding = '20px';
-                pdfContainer.style.boxSizing = 'border-box';
+            const maintRowsHtml = buildRowsHtml(maintenanceTasks, 'maint', maintPhotos);
+            const instRowsHtml = buildRowsHtml(installationTasks, 'inst', instPhotos);
 
-                pdfContainer.innerHTML = `
-                    <!-- CABEÇALHO OFICIAL FRL SERVIÇOS -->
-                    <table style="width: 100%; border-bottom: 2px solid #002B49; padding-bottom: 8px; margin-bottom: 12px; border-collapse: collapse;">
+            // Preenche o Elemento HTML do Relatório visível
+            const reportEl = document.getElementById('pdfReportElement');
+            reportEl.innerHTML = `
+                <!-- CABEÇALHO OFICIAL FRL SERVIÇOS -->
+                <table style="width: 100%; border-bottom: 2px solid #002B49; padding-bottom: 8px; margin-bottom: 12px; border-collapse: collapse;">
+                    <tr>
+                        <td style="vertical-align: top;">
+                            <h1 style="font-size: 20px; font-weight: bold; color: #002B49; margin: 0; line-height: 1;">FRL SERVIÇOS</h1>
+                            <p style="font-size: 9px; color: #475569; margin: 3px 0 0 0;">CNPJ: 58.475.400/0001-33</p>
+                            <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">EST. Antônio Guimarães Mosqueira Nº1301 - Parque Atlântico, Macaé-RJ</p>
+                            <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">TEL: (22) 99961-5971 | E-mail: admfrservicos@gmail.com</p>
+                        </td>
+                        <td style="vertical-align: top; text-align: right; width: 160px;">
+                            <span style="font-size: 10px; font-weight: bold; background-color: #002B49; color: #ffffff; padding: 4px 8px; border-radius: 4px; display: inline-block;">RELATÓRIO TÉCNICO</span>
+                            <p style="font-size: 9px; color: #64748b; margin: 6px 0 0 0;">DATA: ${dataManutencao}</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- DADOS DO EMPREENDIMENTO -->
+                <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid #002B49;">
+                    <h2 style="font-size: 10px; font-weight: bold; color: #002B49; margin: 0 0 4px 0; text-transform: uppercase;">DADOS DO EMPREENDIMENTO / CLIENTE</h2>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
                         <tr>
-                            <td style="vertical-align: top;">
-                                <h1 style="font-size: 20px; font-weight: bold; color: #002B49; margin: 0; line-height: 1;">FRL SERVIÇOS</h1>
-                                <p style="font-size: 9px; color: #475569; margin: 3px 0 0 0;">CNPJ: 58.475.400/0001-33</p>
-                                <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">EST. Antônio Guimarães Mosqueira Nº1301 - Parque Atlântico, Macaé-RJ</p>
-                                <p style="font-size: 9px; color: #475569; margin: 1px 0 0 0;">TEL: (22) 99961-5971 | E-mail: admfrservicos@gmail.com</p>
-                            </td>
-                            <td style="vertical-align: top; text-align: right; width: 180px;">
-                                <span style="font-size: 10px; font-weight: bold; background-color: #002B49; color: #ffffff; padding: 4px 8px; border-radius: 4px; display: inline-block;">RELATÓRIO TÉCNICO</span>
-                                <p style="font-size: 9px; color: #64748b; margin: 6px 0 0 0;">DATA: ${dataManutencao}</p>
-                            </td>
+                            <td style="width: 50%; padding: 2px 0;"><strong>CLIENTE:</strong> ${cliente}</td>
+                            <td style="width: 50%; padding: 2px 0;"><strong>TEL:</strong> ${telefone}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 2px 0;"><strong>ENDEREÇO:</strong> ${endereco}</td>
+                            <td style="padding: 2px 0;"><strong>RESPONSÁVEL:</strong> ${responsavel}</td>
                         </tr>
                     </table>
+                </div>
 
-                    <!-- DADOS DO EMPREENDIMENTO -->
-                    <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid #002B49;">
-                        <h2 style="font-size: 10px; font-weight: bold; color: #002B49; margin: 0 0 4px 0; text-transform: uppercase;">DADOS DO EMPREENDIMENTO / CLIENTE</h2>
-                        <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
-                            <tr>
-                                <td style="width: 50%; padding: 2px 0;"><strong>CLIENTE:</strong> ${cliente}</td>
-                                <td style="width: 50%; padding: 2px 0;"><strong>TEL:</strong> ${telefone}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 2px 0;"><strong>ENDEREÇO:</strong> ${endereco}</td>
-                                <td style="padding: 2px 0;"><strong>RESPONSÁVEL:</strong> ${responsavel}</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- DADOS DO EQUIPAMENTO -->
-                    <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid #0284c7;">
-                        <h2 style="font-size: 10px; font-weight: bold; color: #0284c7; margin: 0 0 4px 0; text-transform: uppercase;">DADOS DO EQUIPAMENTO</h2>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="vertical-align: top;">
-                                    <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
-                                        <tr>
-                                            <td style="width: 50%; padding: 2px 0;"><strong>TAG:</strong> ${tag}</td>
-                                            <td style="width: 50%; padding: 2px 0;"><strong>EQUIPAMENTO:</strong> ${equipamento}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0;"><strong>MODELO:</strong> ${modelo}</td>
-                                            <td style="padding: 2px 0;"><strong>Nº DE SÉRIE:</strong> ${numeroSerie}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0;"><strong>Nº DA SALA:</strong> ${numeroSala}</td>
-                                            <td style="padding: 2px 0;"><strong>BTUS:</strong> ${btus}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0;"><strong>GÁS REFRIGERANTE:</strong> ${gasRefrigerante}</td>
-                                            <td style="padding: 2px 0;"><strong>ÁREA CLIMATIZADA:</strong> ${areaClimatizada}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2" style="padding: 2px 0;"><strong>OCUPANTES:</strong> ${ocupantes}</td>
-                                        </tr>
-                                    </table>
+                <!-- DADOS DO EQUIPAMENTO -->
+                <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid #0284c7;">
+                    <h2 style="font-size: 10px; font-weight: bold; color: #0284c7; margin: 0 0 4px 0; text-transform: uppercase;">DADOS DO EQUIPAMENTO</h2>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="vertical-align: top;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
+                                    <tr>
+                                        <td style="width: 50%; padding: 2px 0;"><strong>TAG:</strong> ${tag}</td>
+                                        <td style="width: 50%; padding: 2px 0;"><strong>EQUIPAMENTO:</strong> ${equipamento}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 2px 0;"><strong>MODELO:</strong> ${modelo}</td>
+                                        <td style="padding: 2px 0;"><strong>Nº DE SÉRIE:</strong> ${numeroSerie}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 2px 0;"><strong>Nº DA SALA:</strong> ${numeroSala}</td>
+                                        <td style="padding: 2px 0;"><strong>BTUS:</strong> ${btus}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 2px 0;"><strong>GÁS REFRIGERANTE:</strong> ${gasRefrigerante}</td>
+                                        <td style="padding: 2px 0;"><strong>ÁREA CLIMATIZADA:</strong> ${areaClimatizada}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 2px 0;"><strong>OCUPANTES:</strong> ${ocupantes}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            ${tagPhotoBase64 ? `
+                                <td style="width: 110px; vertical-align: top; text-align: right; padding-left: 10px;">
+                                    <span style="font-size: 8px; color: #64748b; display: block; margin-bottom: 2px;">Etiqueta</span>
+                                    <img src="${tagPhotoBase64}" style="max-height: 60px; max-width: 100px; object-fit: contain; border-radius: 4px; border: 1px solid #cbd5e1; display: inline-block;" />
                                 </td>
-                                ${tagPhotoBase64 ? `
-                                    <td style="width: 120px; vertical-align: top; text-align: right; padding-left: 10px;">
-                                        <span style="font-size: 8px; color: #64748b; display: block; margin-bottom: 2px;">Etiqueta</span>
-                                        <img src="${tagPhotoBase64}" style="max-height: 60px; max-width: 110px; object-fit: contain; border-radius: 4px; border: 1px solid #cbd5e1; display: inline-block;" />
-                                    </td>
-                                ` : ''}
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- TABELA CHECKLIST DE MANUTENÇÃO -->
-                    <h2 style="font-size: 10px; font-weight: bold; color: #002B49; margin: 0 0 6px 0; text-transform: uppercase;">SERVIÇOS EXECUTADOS / CHECKLIST</h2>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 1px solid #e2e8f0;">
-                        <thead>
-                            <tr style="background-color: #002B49; color: #ffffff; font-size: 9px; text-align: left;">
-                                <th style="padding: 5px; text-align: center; width: 24px;">#</th>
-                                <th style="padding: 5px;">ITEM / ATIVIDADE</th>
-                                <th style="padding: 5px; text-align: center; width: 70px;">STATUS</th>
-                                <th style="padding: 5px;">OBSERVAÇÃO / FOTO / ORÇAMENTO</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${checklistRowsHtml}
-                        </tbody>
+                            ` : ''}
+                        </tr>
                     </table>
+                </div>
 
-                    <!-- OBSERVAÇÕES GERAIS -->
-                    <div style="border: 1px solid #cbd5e1; padding: 8px; border-radius: 4px; background-color: #ffffff; margin-bottom: 12px;">
-                        <strong style="font-size: 9.5px; color: #002B49;">OBSERVAÇÕES TÉCNICAS GERAIS:</strong>
-                        <p style="font-size: 9px; color: #334155; margin: 3px 0 0 0; white-space: pre-line;">${observacoesGerais}</p>
-                    </div>
+                <!-- TABELA: MANUTENÇÃO PREVENTIVA (15 ITENS) -->
+                <h2 style="font-size: 10px; font-weight: bold; color: #002B49; margin: 0 0 6px 0; text-transform: uppercase;">1. ITENS DE MANUTENÇÃO PREVENTIVA</h2>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                    <thead>
+                        <tr style="background-color: #002B49; color: #ffffff; font-size: 9px; text-align: left;">
+                            <th style="padding: 5px; text-align: center; width: 24px;">#</th>
+                            <th style="padding: 5px;">ITEM / ATIVIDADE</th>
+                            <th style="padding: 5px; text-align: center; width: 70px;">STATUS</th>
+                            <th style="padding: 5px;">OBSERVAÇÃO / FOTO / ORÇAMENTO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${maintRowsHtml}
+                    </tbody>
+                </table>
 
-                    <!-- RODAPÉ DO PDF -->
-                    <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 8px; color: #94a3b8;">
-                        FRL Serviços — Relatório Técnico de Manutenção Preventiva HVAC
-                    </div>
-                `;
+                <!-- RESPONSÁVEIS PELA MANUTENÇÃO -->
+                <div style="background-color: #f8fafc; padding: 6px 10px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 9.5px;">
+                        <tr>
+                            <td style="width: 50%; padding: 2px 0;"><strong>NOME DO TÉCNICO:</strong> ${nomeTecnico}</td>
+                            <td style="width: 50%; padding: 2px 0;"><strong>NOME DO CLIENTE:</strong> ${nomeCliente}</td>
+                        </tr>
+                    </table>
+                </div>
 
-                // Anexar elemento ao corpo do documento para possibilitar renderização do canvas
-                document.body.appendChild(pdfContainer);
+                <!-- TABELA: INSTALAÇÃO DE EQUIPAMENTOS (10 ITENS) -->
+                <h2 style="font-size: 10px; font-weight: bold; color: #002B49; margin: 0 0 6px 0; text-transform: uppercase;">2. INSTALAÇÃO DE EQUIPAMENTOS</h2>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                    <thead>
+                        <tr style="background-color: #002B49; color: #ffffff; font-size: 9px; text-align: left;">
+                            <th style="padding: 5px; text-align: center; width: 24px;">#</th>
+                            <th style="padding: 5px;">ITEM / ATIVIDADE DE INSTALAÇÃO</th>
+                            <th style="padding: 5px; text-align: center; width: 70px;">STATUS</th>
+                            <th style="padding: 5px;">OBSERVAÇÃO / FOTO / ORÇAMENTO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${instRowsHtml}
+                    </tbody>
+                </table>
 
-                // Aguardar renderização interna de imagens no DOM
-                await new Promise(resolve => setTimeout(resolve, 300));
+                <!-- OBSERVAÇÕES GERAIS -->
+                <div style="border: 1px solid #cbd5e1; padding: 8px; border-radius: 4px; background-color: #ffffff; margin-bottom: 12px;">
+                    <strong style="font-size: 9.5px; color: #002B49;">OBSERVAÇÕES TÉCNICAS GERAIS:</strong>
+                    <p style="font-size: 9px; color: #334155; margin: 3px 0 0 0; white-space: pre-line;">${observacoesGerais}</p>
+                </div>
+
+                <!-- RODAPÉ DO PDF -->
+                <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 8px; color: #94a3b8;">
+                    FRL Serviços — Relatório Técnico de Manutenção Preventiva e Instalação HVAC
+                </div>
+            `;
+
+            // Abre o modal
+            document.getElementById('pdfModal').classList.remove('hidden');
+        }
+
+        function closePdfModal() {
+            document.getElementById('pdfModal').classList.add('hidden');
+        }
+
+        // DESCARREGA O PDF VIA HTML2PDF.JS A PARTIR DO ELEMENTO TOTALMENTE VISÍVEL
+        async function downloadPdfDirect() {
+            const btn = document.getElementById('btnDownloadPdf');
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span>Baixando...</span>`;
+
+            try {
+                const element = document.getElementById('pdfReportElement');
+                const tag = document.getElementById('tag').value || 'Equipamento';
+                const dataManutencao = document.getElementById('dataManutencao').value || 'hoje';
 
                 const opt = {
-                    margin:       [8, 8, 8, 8],
-                    filename:     `Checklist_FRL_${tag.replace(/[^a-zA-Z0-9]/g, '_')}_${dataManutencao.replace(/\//g, '-')}.pdf`,
+                    margin:       [6, 6, 6, 6],
+                    filename:     `Checklist_FRL_${tag.replace(/[^a-zA-Z0-9]/g, '_')}_${dataManutencao}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, logging: false },
+                    html2canvas:  { scale: 2, useCORS: true, allowTaint: true, scrollX: 0, scrollY: 0 },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
-                await html2pdf().set(opt).from(pdfContainer).save();
-
-                // Remover container temporário
-                document.body.removeChild(pdfContainer);
+                await html2pdf().set(opt).from(element).save();
             } catch (err) {
-                console.error('Erro ao gerar PDF:', err);
-                alert('Erro ao gerar PDF. Por favor tente novamente.');
+                console.error('Erro ao baixar PDF:', err);
+                alert('Tente clicar no botão "Imprimir" e selecionar "Salvar como PDF".');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalBtnHtml;
