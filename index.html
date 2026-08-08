@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FRL serviços - Checklist HVAC</title>
 
-    <!-- App Manifest e Ícones para PWA usando ícone.png -->
-    <link rel="manifest" href="manifest.json">
+    <!-- App Manifest e Ícones para PWA usando ícone.png com fallback e encoding seguro -->
+    <link rel="manifest" id="pwa-manifest-link" href="manifest.json">
     <link rel="icon" type="image/png" href="ícone.png">
     <link rel="apple-touch-icon" href="ícone.png">
     <meta name="theme-color" content="#002B49">
@@ -14,27 +14,101 @@
     <meta name="apple-mobile-web-app-title" content="FRL serviços">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Captura imediata do prompt de instalação nativa do PWA -->
+    <!-- Configuração e captura avançada do PWA para acionar a instalação nativa do Android -->
     <script>
         window.deferredPwaPrompt = null;
+
+        // Captura o evento nativo do Android/Chrome
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             window.deferredPwaPrompt = e;
             console.log('Instalador PWA nativo capturado com sucesso!');
 
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            if (isStandalone) {
-                const btn = document.getElementById('header-install-btn');
-                if (btn) btn.classList.add('hidden');
-                return;
-            }
-
-            const headerBtn = document.getElementById('header-install-btn');
-            if (headerBtn) {
-                headerBtn.classList.remove('hidden');
-                headerBtn.classList.add('animate-pulse');
+            if (!isStandalone) {
+                const headerBtn = document.getElementById('header-install-btn');
+                if (headerBtn) {
+                    headerBtn.classList.remove('hidden');
+                    headerBtn.classList.add('animate-pulse');
+                }
             }
         });
+
+        // Gera um ícone PNG 512x512 em memória para garantir aprovação no Lighthouse do Chrome
+        function createFallbackPwaIcon() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Fundo Azul FRL
+            ctx.fillStyle = '#002B49';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 512, 512, 96);
+            ctx.fill();
+
+            // Símbolo / Texto
+            ctx.fillStyle = '#00A3FF';
+            ctx.font = 'bold 220px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('FRL', 256, 256);
+
+            return canvas.toDataURL('image/png');
+        }
+
+        // Registra Manifest e Service Worker dinâmicos com fallbacks para validação WebAPK
+        (function setupPwaManifestAndSW() {
+            try {
+                const fallbackIconUrl = createFallbackPwaIcon();
+                const encodedIconPath = encodeURI('ícone.png');
+
+                const manifestData = {
+                    name: "FRL serviços",
+                    short_name: "FRL serviços",
+                    description: "Checklist e Manutenção HVAC - FRL serviços",
+                    start_url: "./index.html",
+                    display: "standalone",
+                    background_color: "#001E35",
+                    theme_color: "#002B49",
+                    orientation: "portrait",
+                    icons: [
+                        { src: encodedIconPath, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                        { src: encodedIconPath, sizes: "512x512", type: "image/png", purpose: "any maskable" },
+                        { src: "ícone.png", sizes: "192x192", type: "image/png" },
+                        { src: "ícone.png", sizes: "512x512", type: "image/png" },
+                        { src: fallbackIconUrl, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                    ]
+                };
+
+                const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+                const manifestUrl = URL.createObjectURL(manifestBlob);
+
+                let manifestTag = document.getElementById('pwa-manifest-link');
+                if (manifestTag) {
+                    manifestTag.href = manifestUrl;
+                }
+
+                if ('serviceWorker' in navigator) {
+                    const swCode = `
+                        const CACHE_NAME = 'frl-pwa-v5';
+                        self.addEventListener('install', e => { self.skipWaiting(); });
+                        self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+                        self.addEventListener('fetch', e => {
+                            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                        });
+                    `;
+                    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(swBlob);
+
+                    navigator.serviceWorker.register(swUrl)
+                        .then(reg => console.log('SW PWA Ativo:', reg.scope))
+                        .catch(err => console.log('Aviso SW:', err));
+                }
+            } catch (err) {
+                console.error("Erro ao registrar PWA:", err);
+            }
+        })();
     </script>
 
     <!-- Tailwind CSS, FontAwesome, jsPDF e html2canvas -->
@@ -129,9 +203,9 @@
                         <i class="fa-brands fa-android text-emerald-600 text-sm"></i> No Android (Chrome):
                     </p>
                     <ol class="list-decimal list-inside space-y-1 text-[11px]">
-                        <li>Abra este site pelo <strong>Google Chrome</strong> via HTTPS.</li>
-                        <li>Toque no menu <strong>(⋮) 3 pontinhos</strong> do canto superior direito.</li>
-                        <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
+                        <li>Acesse o link pelo navegador <strong>Google Chrome</strong>.</li>
+                        <li>Toque no botão azul <strong>"Instalar"</strong> no topo.</li>
+                        <li>Se aparecer a mensagem do Chrome, confirme em <strong>"Instalar"</strong>.</li>
                     </ol>
                 </div>
 
@@ -341,55 +415,6 @@
     </div>
 
     <script>
-        // Registra Manifest usando ícone.png do repositório
-        (function setupPwaEnvironment() {
-            try {
-                const manifestData = {
-                    name: "FRL serviços",
-                    short_name: "FRL serviços",
-                    description: "Checklist e Manutenção HVAC - FRL serviços",
-                    start_url: window.location.href,
-                    display: "standalone",
-                    background_color: "#001E35",
-                    theme_color: "#002B49",
-                    icons: [
-                        { src: "ícone.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-                        { src: "ícone.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
-                    ]
-                };
-
-                const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-                const manifestUrl = URL.createObjectURL(manifestBlob);
-
-                let manifestTag = document.querySelector('link[rel="manifest"]');
-                if (!manifestTag) {
-                    manifestTag = document.createElement('link');
-                    manifestTag.rel = 'manifest';
-                    document.head.appendChild(manifestTag);
-                }
-                manifestTag.href = manifestUrl;
-
-                // Registra Service Worker inline
-                if ('serviceWorker' in navigator) {
-                    const swCode = `
-                        const CACHE_NAME = 'frl-pwa-v4';
-                        self.addEventListener('install', e => { self.skipWaiting(); });
-                        self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
-                        self.addEventListener('fetch', e => {
-                            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-                        });
-                    `;
-                    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                    const swUrl = URL.createObjectURL(swBlob);
-
-                    navigator.serviceWorker.register(swUrl)
-                        .then(reg => console.log('SW PWA Ativo:', reg.scope))
-                        .catch(err => console.log('Aviso SW:', err));
-                }
-            } catch (err) {
-                console.error("Erro ao configurar PWA:", err);
-            }
-        })();
 
         // Verificação se o app já está rodando instalado (Standalone PWA)
         function checkAndHideIfInstalled() {
@@ -426,23 +451,10 @@
                 }
                 window.deferredPwaPrompt = null;
             } else {
-                // Notificação rápida se o Chrome ainda estiver preparando o instalador PWA
-                const btn = document.getElementById('header-install-btn');
-                if (btn) {
-                    const originalText = btn.innerHTML;
-                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando...`;
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
-                        if (window.deferredPwaPrompt) {
-                            window.deferredPwaPrompt.prompt();
-                        }
-                    }, 1500);
-                }
+                // Exibe as instruções amigáveis caso o Chrome ainda não tenha preparado o prompt nativo
+                const modal = document.getElementById('install-instructions-modal');
+                if (modal) modal.classList.remove('hidden');
             }
-        }
-
-        function openInstallModal() {
-            // Mantida para compatibilidade interna se necessário
         }
 
         function closeInstallModal() {
@@ -576,12 +588,7 @@
             // Pega dados inseridos (com fallback simples caso não preenchido)
             const clientName = document.getElementById('client-name').value || '-';
             const clientAddress = document.getElementById('client-address').value || '-';
-            const clientPhone = document.getElementById('client-phone').value || '-';
-            const clientResp = document.getElementById('client-resp').value || '-';
 
-            const eqTag = document.getElementById('eq-tag').value || 'HVAC-01';
-            const eqType = document.getElementById('eq-type').value || '-';
-            const eqBrand = document.getElementById('eq-brand').value || '-';
             const eqModel = document.getElementById('eq-model').value || '-';
             const eqSN = document.getElementById('eq-sn').value || '-';
             const eqRoom = document.getElementById('eq-room').value || '-';
@@ -596,12 +603,12 @@
             document.getElementById('pdf-date-str').innerText = `DATA: ${new Date().toLocaleDateString('pt-BR')}`;
             document.getElementById('pdf-out-client').innerText = clientName;
             document.getElementById('pdf-out-address').innerText = clientAddress;
-            document.getElementById('pdf-out-phone').innerText = clientPhone;
-            document.getElementById('pdf-out-resp').innerText = clientResp;
+            document.getElementById('pdf-out-phone').innerText = '-';
+            document.getElementById('pdf-out-resp').innerText = '-';
 
-            document.getElementById('pdf-out-tag').innerText = eqTag;
-            document.getElementById('pdf-out-type').innerText = eqType;
-            document.getElementById('pdf-out-model').innerText = `${eqBrand} ${eqModel}`.trim() || '-';
+            document.getElementById('pdf-out-tag').innerText = 'HVAC';
+            document.getElementById('pdf-out-type').innerText = 'Ar Condicionado';
+            document.getElementById('pdf-out-model').innerText = eqModel;
             document.getElementById('pdf-out-sn').innerText = eqSN;
             document.getElementById('pdf-out-room').innerText = eqRoom;
             document.getElementById('pdf-out-btus').innerText = eqBtus;
@@ -658,7 +665,7 @@
                 const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`Checklist_${eqTag}_${new Date().toISOString().slice(0,10)}.pdf`);
+                pdf.save(`Checklist_FRL_${new Date().toISOString().slice(0,10)}.pdf`);
 
             } catch (err) {
                 console.error('Erro ao gerar PDF:', err);
