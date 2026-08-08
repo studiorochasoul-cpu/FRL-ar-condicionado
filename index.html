@@ -14,6 +14,29 @@
     <meta name="apple-mobile-web-app-title" content="FRL serviços">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+    <!-- Captura imediata do prompt de instalação nativa do PWA -->
+    <script>
+        window.deferredPwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.deferredPwaPrompt = e;
+            console.log('Instalador PWA nativo capturado com sucesso!');
+
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            if (isStandalone) {
+                const btn = document.getElementById('header-install-btn');
+                if (btn) btn.classList.add('hidden');
+                return;
+            }
+
+            const headerBtn = document.getElementById('header-install-btn');
+            if (headerBtn) {
+                headerBtn.classList.remove('hidden');
+                headerBtn.classList.add('animate-pulse');
+            }
+        });
+    </script>
+
     <!-- Tailwind CSS, FontAwesome, jsPDF e html2canvas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -150,51 +173,6 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TELEFONE</label>
-                            <input type="text" id="client-phone" placeholder="(22) 99999-9999" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
-                        </div>
-                        <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">RESPONSÁVEL</label>
-                            <input type="text" id="client-resp" placeholder="Ex: Marcos Silva" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Seção 2: Dados do Equipamento -->
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                <h2 class="text-xs font-extrabold text-navy-900 uppercase tracking-wider flex items-center gap-2 border-b pb-2 border-slate-100">
-                    <i class="fa-solid fa-fan text-sky-600"></i> DADOS DO EQUIPAMENTO
-                </h2>
-
-                <div class="space-y-2 text-xs font-semibold">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">TAG / IDENTIFICAÇÃO</label>
-                            <input type="text" id="eq-tag" placeholder="Ex: ACJ-7.5K-01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
-                        </div>
-                        <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">EQUIPAMENTO</label>
-                            <input type="text" id="eq-type" placeholder="Ex: Ar Condicionado ACJ" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-slate-500 uppercase tracking-wider text-[10px]">MARCA</label>
-                            <select id="eq-brand" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
-                                <option value="">Selecione a marca</option>
-                                <option value="Hisense">Hisense</option>
-                                <option value="Carrier">Carrier</option>
-                                <option value="Daikin">Daikin</option>
-                                <option value="Trane">Trane</option>
-                                <option value="LG">LG</option>
-                                <option value="Midea">Midea</option>
-                                <option value="Springer">Springer</option>
-                                <option value="Outro">Outro</option>
-                            </select>
-                        </div>
-                        <div>
                             <label class="text-slate-500 uppercase tracking-wider text-[10px]">MODELO</label>
                             <input type="text" id="eq-model" placeholder="Ex: HIS-7500-A" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                         </div>
@@ -202,12 +180,7 @@
 
                     <div>
                         <label class="text-slate-500 uppercase tracking-wider text-[10px]">NÚMERO DE SÉRIE</label>
-                        <div class="relative flex items-center">
-                            <input type="text" id="eq-sn" placeholder="Ex: S/N 998234-AX01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 pr-20 text-slate-800 focus:ring-2 focus:ring-navy-900">
-                            <button type="button" onclick="simulateSNScan()" class="absolute right-1 text-navy-900 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm">
-                                <i class="fa-solid fa-qrcode text-sky-600"></i> SCAN
-                            </button>
-                        </div>
+                        <input type="text" id="eq-sn" placeholder="Ex: S/N 998234-AX01" class="w-full bg-slate-100 border-0 rounded-xl p-2.5 text-slate-800 focus:ring-2 focus:ring-navy-900">
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
@@ -433,60 +406,48 @@
         // Executa verificação de modo PWA instalado no carregamento
         window.addEventListener('DOMContentLoaded', checkAndHideIfInstalled);
 
-        // Evento Nativo de Instalação PWA
-        let deferredPwaPrompt = null;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Previne a janela automática para acionar através do botão oficial
-            e.preventDefault();
-            deferredPwaPrompt = e;
-
-            // Se o aplicativo já estiver em modo standalone, garante que o botão não apareça
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            if (isStandalone) {
-                const btn = document.getElementById('header-install-btn');
-                if (btn) btn.classList.add('hidden');
-                return;
-            }
-
-            const headerBtn = document.getElementById('header-install-btn');
-            if (headerBtn) {
-                headerBtn.classList.remove('hidden');
-                headerBtn.classList.add('animate-pulse');
-            }
-        });
-
         // Quando o app é instalado pelo usuário, oculta o botão
         window.addEventListener('appinstalled', () => {
-            deferredPwaPrompt = null;
+            window.deferredPwaPrompt = null;
             const btn = document.getElementById('header-install-btn');
             if (btn) btn.classList.add('hidden');
             console.log('App FRL Serviços instalado com sucesso!');
         });
 
         async function handleInstallClick() {
-            if (deferredPwaPrompt) {
-                // Dispara o diálogo oficial e nativo do Android / Chrome
-                deferredPwaPrompt.prompt();
-                const choiceResult = await deferredPwaPrompt.userChoice;
+            if (window.deferredPwaPrompt) {
+                // Dispara diretamente o diálogo nativo do Android/Chrome
+                window.deferredPwaPrompt.prompt();
+                const choiceResult = await window.deferredPwaPrompt.userChoice;
                 if (choiceResult.outcome === 'accepted') {
                     console.log('Usuário aceitou a instalação do FRL serviços');
                     const btn = document.getElementById('header-install-btn');
                     if (btn) btn.classList.add('hidden');
                 }
-                deferredPwaPrompt = null;
+                window.deferredPwaPrompt = null;
             } else {
-                // Se o evento nativo ainda não disparou ou estiver rodando em iOS/outro browser, abre o instrucional
-                openInstallModal();
+                // Notificação rápida se o Chrome ainda estiver preparando o instalador PWA
+                const btn = document.getElementById('header-install-btn');
+                if (btn) {
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparando...`;
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        if (window.deferredPwaPrompt) {
+                            window.deferredPwaPrompt.prompt();
+                        }
+                    }, 1500);
+                }
             }
         }
 
         function openInstallModal() {
-            document.getElementById('install-instructions-modal').classList.remove('hidden');
+            // Mantida para compatibilidade interna se necessário
         }
 
         function closeInstallModal() {
-            document.getElementById('install-instructions-modal').classList.add('hidden');
+            const modal = document.getElementById('install-instructions-modal');
+            if (modal) modal.classList.add('hidden');
         }
 
         // 11 Itens de inspeção do PDF FRL Serviços
@@ -607,12 +568,6 @@
         function updateChecklistCounter() {
             const okCount = Object.values(taskState).filter(t => t.status === 'OK').length;
             document.getElementById('checklist-counter').innerText = `${okCount}/11 OK`;
-        }
-
-        function simulateSNScan() {
-            const mockSerials = ["HS-7500-2026-X", "CR-12000-A99", "DK-VRV-98765"];
-            const randomSN = mockSerials[Math.floor(Math.random() * mockSerials.length)];
-            document.getElementById('eq-sn').value = randomSN;
         }
 
         async function generatePDFReport(e) {
