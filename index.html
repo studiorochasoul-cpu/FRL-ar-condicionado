@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-slate-50">
 <head>
@@ -434,7 +435,7 @@
             }
         }
 
-        // Renderiza os 15 itens da Manutenção Preventiva
+        // Renderiza os 15 itens da Manutenção Preventiva (OK / NÃO OK)
         function renderMaintenanceItems() {
             const container = document.getElementById('maintItemsContainer');
             container.innerHTML = '';
@@ -447,7 +448,7 @@
                             <p class="text-xs sm:text-sm font-semibold text-slate-800 flex-1">${task}</p>
                         </div>
 
-                        <!-- Opções de Status (OK, NÃO OK, N/A) -->
+                        <!-- Opções de Status (OK, NÃO OK) -->
                         <div class="flex items-center gap-2 pt-1">
                             <label class="flex-1 cursor-pointer">
                                 <input type="radio" name="maint_status_${index}" value="OK" onchange="updateMaintProgress()" class="peer hidden">
@@ -459,12 +460,6 @@
                                 <input type="radio" name="maint_status_${index}" value="NÃO OK" onchange="updateMaintProgress()" class="peer hidden">
                                 <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-600 transition-all shadow-sm">
                                     ✕ NÃO OK
-                                </div>
-                            </label>
-                            <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="maint_status_${index}" value="N/A" onchange="updateMaintProgress()" class="peer hidden">
-                                <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-slate-500 peer-checked:text-white peer-checked:border-slate-500 transition-all shadow-sm">
-                                    – N/A
                                 </div>
                             </label>
                         </div>
@@ -498,7 +493,7 @@
             });
         }
 
-        // Renderiza os 10 itens da Instalação de Equipamentos
+        // Renderiza os 10 itens da Instalação de Equipamentos (SIM / NÃO)
         function renderInstallationItems() {
             const container = document.getElementById('instItemsContainer');
             container.innerHTML = '';
@@ -511,24 +506,18 @@
                             <p class="text-xs sm:text-sm font-semibold text-slate-800 flex-1">${task}</p>
                         </div>
 
-                        <!-- Opções de Status (OK, NÃO OK, N/A) -->
+                        <!-- Opções de Status (SIM, NÃO) -->
                         <div class="flex items-center gap-2 pt-1">
                             <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="inst_status_${index}" value="OK" onchange="updateInstProgress()" class="peer hidden">
+                                <input type="radio" name="inst_status_${index}" value="SIM" onchange="updateInstProgress()" class="peer hidden">
                                 <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600 transition-all shadow-sm">
-                                    ✓ OK
+                                    ✓ SIM
                                 </div>
                             </label>
                             <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="inst_status_${index}" value="NÃO OK" onchange="updateInstProgress()" class="peer hidden">
+                                <input type="radio" name="inst_status_${index}" value="NÃO" onchange="updateInstProgress()" class="peer hidden">
                                 <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-600 transition-all shadow-sm">
-                                    ✕ NÃO OK
-                                </div>
-                            </label>
-                            <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="inst_status_${index}" value="N/A" onchange="updateInstProgress()" class="peer hidden">
-                                <div class="py-1.5 px-2 text-center text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-600 peer-checked:bg-slate-500 peer-checked:text-white peer-checked:border-slate-500 transition-all shadow-sm">
-                                    – N/A
+                                    ✕ NÃO
                                 </div>
                             </label>
                         </div>
@@ -685,8 +674,8 @@
                     const photoBase64 = photoObj[idx];
 
                     let statusColor = '#64748b';
-                    if (status === 'OK') statusColor = '#15803d';
-                    if (status === 'NÃO OK') statusColor = '#b91c1c';
+                    if (status === 'OK' || status === 'SIM') statusColor = '#15803d';
+                    if (status === 'NÃO OK' || status === 'NÃO') statusColor = '#b91c1c';
 
                     let orcamentoFormatted = '';
                     if (rawOrcamento) {
@@ -924,3 +913,4 @@
 </body>
 </html>
 
+```
