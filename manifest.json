@@ -1,7 +1,7 @@
 {
   "name": "FRL serviços",
   "short_name": "FRL serviços",
-  "description": "Sistema de Checklist e Manutenção HVAC - FRL serviços",
+  "description": "Checklist e Manutenção HVAC - FRL serviços",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#001E35",
@@ -9,13 +9,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "ícone.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "ícone.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
