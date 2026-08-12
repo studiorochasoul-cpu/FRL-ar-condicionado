@@ -699,10 +699,10 @@
                         }
                     }
 
-                    // FOTO DO ITEM COM AUMENTO DE TAMANHO (Largura de ~5cm / 180px)
+                    // FOTO DO ITEM COM ARESTA MAIOR DE 12CM (~120mm / ~450px)
                     let photoHtml = '';
                     if (photoBase64) {
-                        photoHtml = `<div style="margin-top: 6px;"><img src="${photoBase64}" style="max-height: 120px; max-width: 180px; width: 100%; object-fit: contain; border-radius: 6px; border: 1px solid #cbd5e1; display: block;" /></div>`;
+                        photoHtml = `<div style="margin-top: 6px;"><img src="${photoBase64}" style="max-height: 450px; max-width: 450px; width: auto; height: auto; object-fit: contain; border-radius: 6px; border: 1px solid #cbd5e1; display: block;" /></div>`;
                     }
 
                     html += `
@@ -762,7 +762,7 @@
                     </table>
                 </div>
 
-                <!-- DADOS DO EQUIPAMENTO E FOTO EXPANDIDA (TAMANHO ~10CM DE LARGURA) -->
+                <!-- DADOS DO EQUIPAMENTO E FOTO EXPANDIDA (ARESTA MAIOR DE 12CM) -->
                 <div style="background-color: #f1f5f9; padding: 8px 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid #0284c7;">
                     <h2 style="font-size: 10px; font-weight: bold; color: #0284c7; margin: 0 0 6px 0; text-transform: uppercase;">DADOS DO EQUIPAMENTO</h2>
                     <table style="width: 100%; border-collapse: collapse;">
@@ -795,7 +795,7 @@
                             <tr>
                                 <td style="padding-top: 10px; text-align: center;">
                                     <span style="font-size: 8.5px; font-weight: bold; color: #002B49; display: block; margin-bottom: 4px; text-transform: uppercase;">Foto da Etiqueta / Placa de Identificação</span>
-                                    <img src="${tagPhotoBase64}" style="max-height: 220px; max-width: 380px; width: 100%; object-fit: contain; border-radius: 6px; border: 1px solid #cbd5e1; display: inline-block; background-color: #ffffff;" />
+                                    <img src="${tagPhotoBase64}" style="max-height: 450px; max-width: 450px; width: auto; height: auto; object-fit: contain; border-radius: 6px; border: 1px solid #cbd5e1; display: inline-block; background-color: #ffffff;" />
                                 </td>
                             </tr>
                         ` : ''}
